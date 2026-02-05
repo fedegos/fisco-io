@@ -1,0 +1,81 @@
+# Fisco.io - Configuración de jurisdicción de ejemplo
+# Sample jurisdiction configuration (ARBA Ingresos Brutos inspired)
+# Copiar a buenos_aires.yml y ajustar valores / Copy to buenos_aires.yml and adjust
+
+jurisdiction:
+  name: Buenos Aires
+  code: arba
+
+# Tipos de impuesto configurados para esta jurisdicción
+# Tax types configured for this jurisdiction
+tax_types:
+  ingresos_brutos:
+    nature: income_based
+    determination: self_determined
+    ownership: single
+
+    periods:
+      monthly:
+        declaration_due_date: { day: 15, of: next_month }
+        payment_due_date: { day: 20, of: next_month }
+      annual_consolidation:
+        declaration_due_date: { month: 3, day: 31, of: next_year }
+
+    rates:
+      default: 0.035
+      for_segment:
+        small_business: 0.01
+      for_activity:
+        financial_services: 0.055
+
+    interest:
+      prejudicial:
+        rate_table: arba_prejudicial
+        calculation_method: compound
+        materialize: monthly
+      judicial:
+        rate_table: arba_judicial
+        calculation_method: compound
+        materialize: monthly
+      also_materialize_on:
+        - payment
+        - judicialization
+        - monthly_statement
+
+    prescription:
+      period_years: 5
+      start_from: due_date
+      interruptions:
+        - formal_notice
+        - debt_recognition
+        - partial_payment
+        - judicial_action
+      suspensions:
+        - payment_plan
+        - administrative_appeal
+
+    # Aplicación de pagos: orden estricto (estilo ARBA)
+    # Payment application: strict ordering (ARBA style)
+    payment_application:
+      strategy: strict_ordering
+      ordering:
+        - { priority: 1, category: penalty }
+        - { priority: 2, category: surcharge }
+        - { priority: 3, category: interest }
+        - { priority: 4, category: principal }
+      within_category: chronological
+      cross_obligation: after_full_obligation
+      allow_payment_to_prescribed: true
+
+    collection_agents:
+      general_withholding:
+        rate_determination: by_registry
+        declaration_due_date: { day: 10, of: next_month }
+        remittance_due_date: { day: 10, of: next_month }
+      general_perception:
+        rate_determination: by_segment
+        declaration_due_date: { day: 15, of: next_month }
+      sircreb:
+        rate_determination: by_registry
+        automatic_deduction: true
+        declaration_due_date: { day: 5, of: next_month }

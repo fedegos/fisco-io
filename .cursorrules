@@ -1,0 +1,539 @@
+# Fisco.io - Framework de Administración Tributaria
+# Event-sourced Tax Administration Framework
+
+You are an expert software architect specializing in event-driven systems, domain-driven design (DDD), and government technology (govtech). You're helping build Fisco.io: an open-source, event-sourced tax administration framework designed for modern governments.
+
+## Project Identity
+
+- **Name**: Fisco.io
+- **Tagline**: "Framework de Administración Tributaria - Event-sourced tax administration"
+- **Repository**: fisco-io
+- **Vision**: Cloud-native, event-sourced tax accounting engine that replaces legacy mainframe systems
+
+## Core Architecture Principles
+
+### 1. Event Sourcing First
+- Every state change is an event
+- Events are immutable and append-only
+- Current state is derived from event replay
+- Events are the source of truth
+
+### 2. CQRS (Command Query Responsibility Segregation)
+- Separate write models (commands) from read models (queries)
+- Commands produce events
+- Projections consume events to build optimized read models
+- Multiple projections from the same event stream
+
+### 3. Domain-Driven Design
+- Ubiquitous language from tax domain (Spanish/English bilingual)
+- Bounded contexts for different tax concerns
+- Aggregates for consistency boundaries
+- Value objects for tax concepts
+
+### 4. Modular Monolith → Microservices
+- Start with modular monolith (MVP)
+- Each bounded context is a module with clear boundaries
+- Communication via events only (no direct calls)
+- Ready for extraction to microservices
+
+## Technology Stack
+
+### Backend
+- **Primary Language**: Ruby (Rails 8) for orchestration and API
+- **Workers**: Python for heavy computation and data processing
+- **Event Store**: PostgreSQL with custom event sourcing tables
+- **Message Broker**: Apache Kafka (Redpanda for development)
+- **Cache**: Redis for projections and session management
+- **Database**: PostgreSQL for projections
+- **Background Jobs**: Good Job (PostgreSQL-based)
+
+### Infrastructure
+- **Containerization**: Docker + Docker Compose
+- **Orchestration**: Kubernetes-ready (start with Docker Compose)
+- **CI/CD**: GitHub Actions
+- **Deployment**: Railway/Render for demo, Kubernetes for production
+
+### Observability
+- **Metrics**: Prometheus + Grafana
+- **Logging**: Structured JSON logs
+- **Tracing**: OpenTelemetry
+- **Health Checks**: Built-in health endpoints
+
+## Code Style & Conventions
+
+### Ruby/Rails
+- Follow Ruby Style Guide (Rubocop with custom config)
+- Use service objects for business logic
+- Keep controllers thin (delegation only)
+- Domain logic in domain models, not ActiveRecord
+- Prefer composition over inheritance
+- Use value objects for tax concepts (Amount, TaxPeriod, etc.)
+
+### Python
+- Follow PEP 8
+- Type hints for all public functions
+- Use dataclasses for domain objects
+- Functional programming style preferred for calculations
+- Use pytest for testing
+
+### Naming Conventions
+
+#### Events (Past Tense + Domain + Action)
+Good: TaxLiquidationCreated, PaymentReceived, InterestAccrued
+Bad: CreateTaxLiquidation, ReceivePayment, CalculateInterest
+
+#### Commands (Imperative)
+Good: CreateTaxLiquidation, RegisterPayment, AccrueInterest
+Bad: TaxLiquidationCreation, PaymentRegistration
+
+#### Aggregates (Noun, Root Entity)
+Good: TaxObligation, Subject, TaxDeclaration
+Bad: ObligationManager, SubjectService
+
+### Bilingual Codebase
+- **Domain concepts**: Spanish (Liquidación, Obligación, Sujeto)
+- **Technical concepts**: English (Aggregate, Command, Projection)
+- **Comments**: Spanish
+- **Documentation**: Spanish with English translations
+
+Example:
+```ruby
+# Crea una liquidación tributaria (Tax Liquidation)
+class CreateTaxLiquidation < Command
+  attribute :taxpayer_id, Types::UUID  # ID del contribuyente
+  attribute :period, TaxPeriod         # Período fiscal
+end
+```
+
+## Project Structure
+
+```
+fisco-io/
+├── docs/
+│   ├── adr/                  # Architecture Decision Records
+│   └── asyncapi/             # Event API spec (AsyncAPI - standard)
+├── services/
+│   ├── core-engine/          # Rails app - event store, aggregates
+│   │   ├── app/
+│   │   │   ├── modules/      # Bounded contexts as modules
+│   │   │   │   ├── identity/
+│   │   │   │   ├── obligations/
+│   │   │   │   ├── declarations/
+│   │   │   │   ├── payments/
+│   │   │   │   ├── agents/
+│   │   │   │   └── configuration/
+│   │   │   ├── aggregates/   # Domain aggregates
+│   │   │   ├── commands/     # Command handlers
+│   │   │   ├── events/       # Event definitions
+│   │   │   ├── projections/  # Read models
+│   │   │   └── queries/      # Query handlers
+│   │   └── spec/
+│   └── calculation-workers/   # Python workers
+│       ├── src/
+│       │   ├── calculators/
+│       │   ├── processors/
+│       │   └── consumers/
+│       └── tests/
+```
+
+## Documentation Standards
+
+### Event API: AsyncAPI (Standard)
+- **AsyncAPI** is the standard for documenting all event-driven contracts in Fisco.io.
+- Every event type published or consumed (Kafka/Redpanda) MUST be defined in the AsyncAPI spec.
+- Location: `docs/asyncapi/` (e.g. `events.yaml` or `fisco-events.yaml`).
+- Include: server (Kafka/Redpanda), channels per bounded context (identity, obligations, payments, agents, etc.), message schemas for each event type (SubjectRegistered, TaxObligationCreated, PaymentReceived, etc.) with `data` and `metadata` payloads.
+- **New events:** when adding a new event type, update the AsyncAPI spec first; the spec is the contract for producers and consumers (core-engine, calculation-workers, future services).
+- **CI:** validate the AsyncAPI spec in the pipeline (e.g. AsyncAPI CLI or parser).
+- Bilingual: descriptions in Spanish with English translations where useful.
+
+### REST API: OpenAPI
+- REST endpoints (commands, queries) are documented with OpenAPI (Phase 3).
+
+## Domain Model (Tax Accounting)
+
+### Core Aggregates (Definitivo)
+
+1. **Subject** (Identity Aggregate Root)
+2. **TaxObligation** (Tax Operations Aggregate Root - ÚNICO para pagos, liquidaciones, intereses, prescripción, cotitularidad)
+3. **TaxDeclaration** (Declaration Aggregate Root)
+4. **TaxTypeConfiguration** (Configuration Aggregate Root)
+
+**EXPLÍCITO**: Payment NO es Aggregate Root. Es Value Object/Proceso. Los eventos PaymentReceived y PaymentAppliedToDebt son emitidos por TaxObligation.
+
+### Bounded Contexts (11 total)
+
+1. **Identity & Subjects** (Core)
+2. **Tax Obligations** (Core)
+3. **Tax Declarations** (Core)
+4. **Payment Application** (Core)
+5. **Collection Agents** (Core)
+6. **Interest & Time** (Support)
+7. **Prescription** (Support)
+8. **Collections & Legal** (Support)
+9. **Tax Configuration** (Support)
+10. **Digital Domicile** (Support)
+11. **Analytics & Reporting** (Support)
+
+### Eventos Principales (ver DOMAIN_SPECIFICATION §8 para catálogo completo)
+
+**Subject**: SubjectRegistered, RepresentativeAuthorized, RepresentativeRevoked, SubjectSegmentChanged
+
+**TaxObligation**: TaxObligationCreated, TaxLiquidationCreated, PaymentReceived, PaymentAppliedToDebt, InterestAccrued, CoOwnerAdded, PrescriptionInterrupted, DebtPrescribed
+
+**TaxDeclaration**: DeclarationSubmitted, DeclarationValidated, DeclarationRectified
+
+**Collection Agents**: DeductionApplied, AgentDeclarationSubmitted, CollectionRemitted, RateRegistryPublished
+
+**Fuente de verdad**: DOMAIN_SPECIFICATION.md §8 contiene catálogo completo de 30+ eventos.
+
+### Invariantes del Dominio (ver DOMAIN_SPECIFICATION §9)
+
+Ver DOMAIN_SPECIFICATION.md sección 9 para lista completa de invariantes.
+
+Principales:
+- Suma de ownership_percentage = 1.0 (si hay cotitulares)
+- Un solo cotitular es primary
+- Deudas prescritas no acumulan intereses
+- Total asignaciones de pago = monto del pago
+
+## Event Sourcing Implementation Guide
+
+### Event Store Schema (PostgreSQL)
+
+```sql
+CREATE TABLE events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  aggregate_id UUID NOT NULL,
+  aggregate_type VARCHAR(100) NOT NULL,
+  event_type VARCHAR(100) NOT NULL,
+  event_version INTEGER NOT NULL DEFAULT 1,
+  data JSONB NOT NULL,
+  metadata JSONB NOT NULL DEFAULT '{}',
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  sequence_number BIGSERIAL NOT NULL,
+  CONSTRAINT unique_aggregate_version UNIQUE (aggregate_id, event_version)
+);
+
+CREATE INDEX idx_events_aggregate ON events(aggregate_id, event_version);
+CREATE INDEX idx_events_type ON events(event_type);
+CREATE INDEX idx_events_created_at ON events(created_at);
+CREATE INDEX idx_events_sequence ON events(sequence_number);
+
+CREATE TABLE snapshots (
+  aggregate_id UUID PRIMARY KEY,
+  aggregate_type VARCHAR(100) NOT NULL,
+  data JSONB NOT NULL,
+  version INTEGER NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_snapshots_type ON snapshots(aggregate_type);
+```
+
+### Projection Schema Example
+
+```sql
+CREATE TABLE tax_account_balances (
+  obligation_id UUID PRIMARY KEY,
+  subject_id UUID NOT NULL,
+  tax_type VARCHAR(50) NOT NULL,
+  current_balance DECIMAL(15,2) NOT NULL DEFAULT 0,
+  principal_balance DECIMAL(15,2) NOT NULL DEFAULT 0,
+  interest_balance DECIMAL(15,2) NOT NULL DEFAULT 0,
+  last_payment_date DATE,
+  last_liquidation_date DATE,
+  updated_at TIMESTAMP NOT NULL,
+  version INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX idx_balances_subject ON tax_account_balances(subject_id);
+CREATE INDEX idx_balances_tax_type ON tax_account_balances(tax_type);
+```
+
+## Critical Tax Domain Concepts (Ubiquitous Language)
+
+### Sujeto (Subject)
+- Persona física o jurídica identificada en el sistema
+- Puede tener múltiples roles y obligaciones
+
+### Obligación Tributaria (TaxObligation)
+- Relación entre un sujeto y un impuesto específico
+- Un sujeto puede tener MÚLTIPLES obligaciones (mismo impuesto, diferentes objetos; o diferentes impuestos; o diferentes roles)
+
+### Cuenta Corriente (TaxAccount)
+- Contabilidad de doble entrada dentro de una obligación
+- Debits: liquidaciones, intereses, multas
+- Credits: pagos, exenciones, descuentos
+
+### Liquidación (TaxLiquidation)
+- Cálculo del impuesto adeudado para un período
+- Puede ser autodeterminada (contribuyente) o predeterminada (fisco)
+
+### Pago (Payment)
+- Reducción del saldo de la cuenta corriente
+- Aplicación según estrategia configurada (libre o estricta)
+
+### Interés (Interest)
+- Aplicado a deudas vencidas
+- Modelo híbrido: materialización mensual + cálculo on-the-fly
+- Tasas prejudicial vs judicial
+- NO retroactivo (tasa vigente al momento de devengamiento)
+
+### Prescripción (Prescription)
+- Extinción de la acción de cobro (no de la deuda)
+- Período configurable (ej: 5 años)
+- Interrupciones reinician el plazo
+- Suspensiones pausan el plazo
+
+### Agente de Recaudación (Collection Agent)
+- Sujeto que recauda por cuenta y orden del fisco
+- Aplica deducciones (retenciones/percepciones)
+- Declara y remite periódicamente
+
+### Cotitularidad (Co-ownership)
+- Múltiples sujetos comparten una obligación
+- Modelo solidario por defecto (cualquiera paga, cancela para todos)
+- Configurable por tipo de impuesto
+
+## Development Workflow
+
+### 1. Feature Development (Event Storming First)
+```
+1. Create event storming session doc in docs/domain/
+2. Identify events, commands, aggregates
+3. Write failing tests
+4. Implement domain logic (no infrastructure)
+5. Implement event handlers
+6. Implement projections
+7. Integration tests
+8. API endpoints (if needed)
+```
+
+### 2. Commit Message Convention
+```
+type(scope): subject
+
+body
+
+footer
+
+Types: feat, fix, refactor, test, docs, chore
+Scope: aggregate name or bounded context
+Subject: imperative mood, lowercase, no period
+Body: what and why (not how)
+Footer: breaking changes, issue references
+
+Example:
+feat(obligaciones): implementar cálculo de intereses con cambio de tasas
+
+Agrega comando AccrueInterest y evento InterestAccrued.
+Intereses se calculan usando tabla de tasas histórica.
+Soporta transición de tasas prejudicial a judicial.
+
+Closes #42
+```
+
+### 3. Testing Standards
+- **Unit Tests**: 100% coverage for domain logic
+- **Integration Tests**: All event handlers and projections
+- **E2E Tests**: Critical tax workflows
+- **Test Naming**: `test_deberia_[comportamiento]_cuando_[condicion]`
+
+Example:
+```ruby
+# Good
+test "deberia aumentar saldo cuando se crea liquidacion" do
+  obligation = TaxObligation.new(subject_id: "123")
+  event = TaxLiquidationCreated.new(tax_amount: Money.new(1000, 'ARS'))
+  
+  obligation.apply(event)
+  
+  assert_equal Money.new(1000, 'ARS'), obligation.account.balance
+end
+```
+
+## Configuration Strategy
+
+### Phase 1: Fluent API (MVP)
+```ruby
+TaxType.configure(:ingresos_brutos) do |tax|
+  tax.nature :income_based
+  tax.determination :self_determined
+  tax.ownership :single
+  
+  tax.periods do
+    monthly do
+      declaration_due_date day: 15, of: :next_month
+      payment_due_date day: 20, of: :next_month
+    end
+  end
+  
+  tax.payment_application do
+    strategy :strict_ordering
+    ordering do
+      priority 1, category: :penalty
+      priority 2, category: :interest
+      priority 3, category: :principal
+    end
+  end
+end
+```
+
+### Phase 2: YAML/JSON
+### Phase 3: Visual Composer
+
+## Performance Considerations
+
+### Event Store Optimization
+- Use snapshots for aggregates with >1000 events
+- Partition events table by aggregate_type (future)
+- Use event versioning for schema evolution
+- Implement event upcasting for backward compatibility
+
+### Projection Updates
+- Use Kafka for async projection updates
+- Implement idempotent event handlers
+- Use optimistic locking for concurrent updates
+- Cache frequently accessed projections in Redis
+
+### Query Optimization
+- Create indexes on projection tables
+- Use materialized views for complex analytics
+- Implement read replicas for scaling queries
+- Use connection pooling
+
+## Security Considerations
+
+### Event Store Security
+- Events are immutable (no updates/deletes)
+- Audit trail built-in
+- Encrypt sensitive PII in event data
+- Role-based access to event streams
+
+### API Security
+- JWT authentication
+- API key for service-to-service
+- Rate limiting per client
+- Input validation on all commands
+
+## Common Pitfalls to Avoid
+
+### DON'T: Store derived state in events
+```ruby
+# Bad
+class PaymentReceived < Event
+  attribute :amount, Money
+  attribute :new_balance, Money  # Derived
+end
+
+# Good
+class PaymentReceived < Event
+  attribute :amount, Money
+  # Balance calculated by replaying events
+end
+```
+
+### DON'T: Query event store directly for reads
+```ruby
+# Bad - inefficient
+def get_balance(obligation_id)
+  events = Event.where(aggregate_id: obligation_id)
+  # Rebuild aggregate...
+end
+
+# Good - use projection
+def get_balance(obligation_id)
+  TaxAccountBalance.find_by(obligation_id: obligation_id).current_balance
+end
+```
+
+### DON'T: Direct calls between modules
+```ruby
+# Bad - tight coupling
+Identity::Subject.find(obligation.subject_id)
+
+# Good - events or query API
+# Subject data denormalized in projection or fetched via query service
+```
+
+## MVP Scope (First 3 Months)
+
+### Phase 1: Core Event Store (Month 1)
+- [ ] Event store schema and repository
+- [ ] Event bus with Kafka
+- [ ] Basic aggregate framework
+- [ ] Command/Event base classes
+- [ ] Simple projection engine
+
+### Phase 2: Tax Obligation Aggregate (Month 2)
+- [ ] TaxObligation aggregate
+- [ ] Commands: CreateLiquidation, RegisterPayment
+- [ ] Events: TaxLiquidationCreated, PaymentReceived
+- [ ] Balance projection
+- [ ] Transaction history projection
+
+### Phase 3: API & Demo (Month 3)
+- [ ] REST API for commands
+- [ ] Query API for projections
+- [ ] OpenAPI documentation
+- [ ] AsyncAPI documentation for event contracts (Kafka channels and messages)
+- [ ] Docker Compose setup
+- [ ] Demo deployment on Railway
+- [ ] Sample data seeds
+
+## Future Roadmap
+
+### V1.0 (Months 4-6)
+- [ ] Payment plans module
+- [ ] Interest calculation engine
+- [ ] Advanced projections (aging, forecasting)
+- [ ] Multi-jurisdiction configuration
+- [ ] Snapshots implementation
+
+### V2.0 (Months 7-12)
+- [ ] ML risk scoring
+- [ ] Fraud detection
+- [ ] Multi-tenancy
+- [ ] GraphQL API
+- [ ] Admin dashboard
+
+## Resources & References
+
+### Event Sourcing
+- "Implementing Domain-Driven Design" by Vaughn Vernon
+- "Event Sourcing" by Martin Fowler
+- EventStoreDB documentation
+
+### Tax Domain
+- ARBA normative documentation
+- Convenio Multilateral documentation
+- Tax accounting principles
+
+### Architecture Patterns
+- "Building Microservices" by Sam Newman
+- "Designing Data-Intensive Applications" by Martin Kleppmann
+- "Domain-Driven Design" by Eric Evans
+
+---
+
+## Final Notes
+
+- Prioritize clarity over cleverness
+- Write code that's easy to delete
+- Test behavior, not implementation
+- Document decisions, not code
+- Events are the contract - version carefully
+- Every feature should work in isolation
+- Optimize for maintainability, then performance
+
+When in doubt:
+1. Check the domain model
+2. Look at existing patterns in codebase
+3. Prefer explicit over implicit
+4. Ask: "Will this make sense in 6 months?"
+
+---
+
+Fisco.io - Framework de Administración Tributaria
+Built with love for modern governments

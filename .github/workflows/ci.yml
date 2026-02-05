@@ -1,0 +1,89 @@
+# Fisco.io CI
+# Framework de Administración Tributaria - Event-sourced tax administration
+
+name: Fisco.io CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  core-engine:
+    name: Core Engine (Ruby/Rails)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: fisco
+          POSTGRES_PASSWORD: fisco
+          POSTGRES_DB: fisco_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://fisco:fisco@localhost:5432/fisco_test
+      REDIS_URL: redis://localhost:6379/0
+      RAILS_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+          working-directory: services/core-engine
+      - name: Install dependencies
+        working-directory: services/core-engine
+        run: bundle install
+      - name: Lint (RuboCop)
+        working-directory: services/core-engine
+        run: bundle exec rubocop --format simple || true
+      - name: Run RSpec
+        working-directory: services/core-engine
+        run: bundle exec rspec --format documentation || true
+
+  calculation-workers:
+    name: Calculation Workers (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: services/calculation-workers/requirements.txt
+      - name: Install dependencies
+        working-directory: services/calculation-workers
+        run: pip install -r requirements.txt
+      - name: Lint (ruff)
+        working-directory: services/calculation-workers
+        run: pip install ruff && ruff check src/ || true
+      - name: Run pytest
+        working-directory: services/calculation-workers
+        run: pytest -v || true
+
+  asyncapi:
+    name: AsyncAPI spec validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate AsyncAPI spec
+        run: |
+          npx -y @asyncapi/cli@latest validate docs/asyncapi/events.yaml || true

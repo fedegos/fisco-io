@@ -1,0 +1,77 @@
+# Fisco.io - Docker Compose
+# Framework de Administración Tributaria - Event-sourced tax administration
+# Desarrollo local / Local development
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: fisco
+      POSTGRES_PASSWORD: fisco
+      POSTGRES_DB: fisco_development
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fisco"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redpanda:
+    image: redpandadata/redpanda:v24.2.2
+    command: redpanda start --smp 1 --overprovisioned --memory 1G
+    ports:
+      - "9092:9092"
+    volumes:
+      - redpanda_data:/var/lib/redpanda/data
+
+  core-engine:
+    build:
+      context: ./services/core-engine
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://fisco:fisco@postgres:5432/fisco_development
+      REDIS_URL: redis://redis:6379/0
+      RAILS_ENV: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./services/core-engine:/app
+    command: bin/rails server -b 0.0.0.0
+
+  calculation-workers:
+    build:
+      context: ./services/calculation-workers
+      dockerfile: Dockerfile
+    depends_on:
+      - redpanda
+      - postgres
+    environment:
+      KAFKA_BROKERS: redpanda:9092
+      DATABASE_URL: postgresql://fisco:fisco@postgres:5432/fisco_development
+    volumes:
+      - ./services/calculation-workers:/app
+
+volumes:
+  postgres_data:
+  redis_data:
+  redpanda_data:

@@ -1,0 +1,9 @@
+# Fisco.io - Calculation Workers
+# Python workers for heavy computation and data processing
+
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Kafka/Redpanda (uncomment when implementing consumers)
+# confluent-kafka>=2.3.0
+# aiokafka>=0.10.0

@@ -1,0 +1,73 @@
+# Fisco.io - Git ignore
+# Framework de Administración Tributaria
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Rails / core-engine
+log/
+tmp/
+storage/
+.bundle/
+vendor/bundle/
+*.gem
+*.rbc
+.byebug_history
+coverage/
+.rspec_status
+*.sqlite3
+*.sqlite3-*
+/public/assets
+/public/packs
+/public/packs-test
+/node_modules
+/yarn-error.log
+yarn-debug.log*
+.yarn-integrity
+# Python / calculation-workers
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+venv/
+.venv/
+ENV/
+env/
+
+# Docker
+*.log
+.docker/
+
+# IDE / editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

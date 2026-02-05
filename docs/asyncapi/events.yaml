@@ -1,0 +1,143 @@
+# Fisco.io - Event Contracts (AsyncAPI)
+# Contratos de eventos del framework / Framework event contracts
+# Fuente de verdad para productores y consumidores (core-engine, calculation-workers)
+
+asyncapi: 2.6.0
+
+info:
+  title: Fisco.io - Event Contracts
+  version: 0.1.0
+  description: |
+    Contratos de eventos para el framework de administración tributaria Fisco.io.
+    Event contracts for the Fisco.io tax administration framework.
+    Todos los eventos publicados/consumidos (Kafka/Redpanda) deben estar definidos aquí.
+
+servers:
+  development:
+    url: ${KAFKA_BROKERS:-localhost:9092}
+    protocol: kafka
+    description: Redpanda/Kafka desarrollo / Development
+
+channels:
+  identity/subject:
+    description: Eventos del agregado Subject (sujeto obligado) / Subject aggregate events
+    subscribe:
+      message:
+        oneOf:
+          - $ref: "#/components/messages/SubjectRegistered"
+          - $ref: "#/components/messages/RepresentativeAuthorized"
+          - $ref: "#/components/messages/RepresentativeRevoked"
+          - $ref: "#/components/messages/SubjectSegmentChanged"
+
+  obligations/obligation:
+    description: Eventos del agregado TaxObligation (pagos, liquidaciones, intereses) / TaxObligation aggregate events
+    subscribe:
+      message:
+        oneOf:
+          - $ref: "#/components/messages/TaxObligationCreated"
+          - $ref: "#/components/messages/TaxLiquidationCreated"
+          - $ref: "#/components/messages/PaymentReceived"
+          - $ref: "#/components/messages/PaymentAppliedToDebt"
+          - $ref: "#/components/messages/InterestAccrued"
+          - $ref: "#/components/messages/CoOwnerAdded"
+
+  agents/collection:
+    description: Eventos de agentes de recaudación / Collection agents events
+    subscribe:
+      message:
+        oneOf:
+          - $ref: "#/components/messages/DeductionApplied"
+          - $ref: "#/components/messages/AgentDeclarationSubmitted"
+          - $ref: "#/components/messages/CollectionRemitted"
+          - $ref: "#/components/messages/RateRegistryPublished"
+
+components:
+  messages:
+    SubjectRegistered:
+      name: SubjectRegistered
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+      description: Sujeto registrado en el sistema / Subject registered
+    RepresentativeAuthorized:
+      name: RepresentativeAuthorized
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    RepresentativeRevoked:
+      name: RepresentativeRevoked
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    SubjectSegmentChanged:
+      name: SubjectSegmentChanged
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    TaxObligationCreated:
+      name: TaxObligationCreated
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    TaxLiquidationCreated:
+      name: TaxLiquidationCreated
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    PaymentReceived:
+      name: PaymentReceived
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    PaymentAppliedToDebt:
+      name: PaymentAppliedToDebt
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    InterestAccrued:
+      name: InterestAccrued
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    CoOwnerAdded:
+      name: CoOwnerAdded
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    DeductionApplied:
+      name: DeductionApplied
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    AgentDeclarationSubmitted:
+      name: AgentDeclarationSubmitted
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    CollectionRemitted:
+      name: CollectionRemitted
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    RateRegistryPublished:
+      name: RateRegistryPublished
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+
+  schemas:
+    EventEnvelope:
+      type: object
+      required:
+        - aggregate_id
+        - event_type
+        - event_version
+        - data
+      properties:
+        aggregate_id:
+          type: string
+          format: uuid
+          description: ID del agregado / Aggregate ID
+        event_type:
+          type: string
+          description: Tipo de evento (past tense) / Event type
+        event_version:
+          type: integer
+          minimum: 1
+          description: Versión del esquema del evento / Event schema version
+        data:
+          type: object
+          description: Payload del evento (específico por event_type) / Event payload
+        metadata:
+          type: object
+          default: {}
+        occurred_at:
+          type: string
+          format: date-time
+          description: Momento de ocurrencia / Occurrence time
