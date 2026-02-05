@@ -41,5 +41,23 @@ RSpec.describe Identity::Handlers::RegisterSubjectHandler do
       loaded = repository.load(subject_id, Identity::Subject)
       expect(loaded.subject_id).to eq(subject_id)
     end
+
+    it "actualiza la proyección SubjectReadModel al registrar un subject" do
+      skip "tabla subjects no existe" unless SubjectReadModel.table_exists?
+
+      cmd = Identity::Commands::RegisterSubject.new(
+        tax_id: "20-99999999-9",
+        legal_name: "Proyección SA",
+        trade_name: "Proy"
+      )
+
+      result = handler.call(cmd)
+
+      row = SubjectReadModel.find_by!(subject_id: result[:subject_id])
+      expect(row.tax_id).to eq("20-99999999-9")
+      expect(row.legal_name).to eq("Proyección SA")
+      expect(row.trade_name).to eq("Proy")
+      expect(row.status).to eq("active")
+    end
   end
 end

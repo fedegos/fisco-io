@@ -3,16 +3,15 @@
 
 FROM ruby:3.2-alpine
 
-RUN apk add --no-cache build-base libpq-dev nodejs tzdata
+RUN apk add --no-cache build-base libpq-dev yaml-dev nodejs tzdata
 
 WORKDIR /app
 
 COPY Gemfile Gemfile.lock* ./
-RUN bundle config set --local deployment 'true' && \
-    bundle config set --local without 'development test' && \
-    bundle install --jobs 4 --retry 3 || true
+# Instalar todas las gems (incl. test y development) para poder correr rspec y rubocop
+RUN bundle install --jobs 4 --retry 3
 
 COPY . .
 
 EXPOSE 3000
-CMD ["bin/rails", "server", "-b", "0.0.0.0"]
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]

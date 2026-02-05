@@ -1,103 +1,80 @@
-# Fisco.io - Makefile autodocumentado
-# Framework de Administración Tributaria - Infraestructura, build, CI/CD local, monitoreo
-# Uso: make [target]. Por defecto: make help
+# Fisco.io - Makefile
+# Framework de Administración Tributaria - Event-sourced tax administration
+#
+# Convención: Rails, bundle, pip, pytest, migraciones, etc. se ejecutan SIEMPRE
+# dentro de los contenedores (core-engine o calculation-workers) vía docker compose.
 
-.DEFAULT_GOAL := help
+COMPOSE = docker compose
+CORE = $(COMPOSE) run --rm core-engine
+WORKERS = $(COMPOSE) run --rm calculation-workers
 
-# docker compose (v2) o docker-compose (v1). Sobrescribir: make COMPOSE_CMD=docker-compose
-COMPOSE_CMD ?= docker compose
-COMPOSE_FILE ?= docker-compose.yml
+.PHONY: help up down build
 
-.PHONY: help up up-d down down-v ps logs logs-f infra-only build build-core build-workers
-.PHONY: db-migrate db-rollback db-reset test test-core test-workers lint lint-core lint-workers
-.PHONY: validate-asyncapi ci health clean clean-volumes
+help:
+	@echo "Fisco.io - Comandos disponibles (todos corren en Docker):"
+	@echo "  make up          - Levantar stack (postgres, redis, redpanda, core-engine)"
+	@echo "  make down        - Bajar stack"
+	@echo "  make build       - Construir imágenes"
+	@echo "  make bundle      - bundle install (core-engine)"
+	@echo "  make migrate     - rails db:migrate (core-engine)"
+	@echo "  make console     - rails console (core-engine)"
+	@echo "  make test        - rspec + pytest"
+	@echo "  make test-core   - rspec (core-engine)"
+	@echo "  make test-workers - pytest (calculation-workers)"
+	@echo "  make lint        - rubocop + ruff"
+	@echo "  make lint-core   - rubocop (core-engine)"
+	@echo "  make lint-workers - ruff (calculation-workers)"
+	@echo "  make validate-asyncapi - Validar spec AsyncAPI (npx, host)"
 
-help: ## Lista todos los targets con descripción
-	@echo "Fisco.io - Targets disponibles (make <target>)"
-	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
+up:
+	$(COMPOSE) up -d postgres redis redpanda
+	$(COMPOSE) up -d core-engine
 
-# --- Infraestructura (Docker Compose) ---
+down:
+	$(COMPOSE) down
 
-up: ## Levantar todos los servicios (foreground)
-	$(COMPOSE_CMD) -f $(COMPOSE_FILE) up
+build:
+	$(COMPOSE) build
 
-up-d: ## Levantar todos los servicios (detached)
-	$(COMPOSE_CMD) -f $(COMPOSE_FILE) up -d
+# --- Core Engine (Rails) - siempre en contenedor ---
+bundle:
+	$(CORE) bundle install
 
-down: ## Bajar servicios y redes (volúmenes se mantienen)
-	$(COMPOSE_CMD) -f $(COMPOSE_FILE) down
+migrate:
+	$(CORE) bundle exec rails db:migrate
 
-down-v: ## Bajar servicios y eliminar volúmenes
-	$(COMPOSE_CMD) -f $(COMPOSE_FILE) down -v
+console:
+	$(CORE) bundle exec rails console
 
-ps: ## Estado de contenedores del proyecto
-	$(COMPOSE_CMD) -f $(COMPOSE_FILE) ps
+routes:
+	$(CORE) bundle exec rails routes
 
-logs: ## Logs de todos los servicios (ARGS=-f para follow)
-	$(COMPOSE_CMD) -f $(COMPOSE_FILE) logs $(ARGS)
+# Prepara la DB de test (bundle, crear y migrar) y corre RSpec
+test-core: test-db
+	$(CORE) env RAILS_ENV=test bundle exec rspec --format documentation
 
-logs-f: ## Logs en tiempo real (follow)
-	$(COMPOSE_CMD) -f $(COMPOSE_FILE) logs -f
+# Instala gems en vendor/bundle (volumen) y crea/migra DB de test
+test-db:
+	$(CORE) sh -c "bundle config set --local path vendor/bundle && bundle install && env RAILS_ENV=test bundle exec rails db:create db:migrate"
 
-infra-only: ## Levantar solo postgres, redis, redpanda (sin core-engine ni workers)
-	$(COMPOSE_CMD) -f $(COMPOSE_FILE) up -d postgres redis redpanda
+lint-core:
+	$(CORE) bundle exec rubocop --format simple
 
-# --- Build ---
+# --- Calculation Workers (Python) - siempre en contenedor ---
+pip-install:
+	$(WORKERS) pip install -r requirements.txt
 
-build: ## Build de todas las imágenes
-	$(COMPOSE_CMD) -f $(COMPOSE_FILE) build
+test-workers:
+	$(WORKERS) pytest -v
 
-build-core: ## Build solo core-engine
-	$(COMPOSE_CMD) -f $(COMPOSE_FILE) build core-engine
+lint-workers:
+	$(WORKERS) ruff check src/
 
-build-workers: ## Build solo calculation-workers
-	$(COMPOSE_CMD) -f $(COMPOSE_FILE) build calculation-workers
+# --- Agregados ---
+test: test-core test-workers
 
-# --- Base de datos ---
+lint: lint-core lint-workers
 
-db-migrate: ## Ejecutar migraciones en core-engine (requiere contenedores up o Rails local)
-	$(COMPOSE_CMD) -f $(COMPOSE_FILE) exec core-engine bin/rails db:migrate || (cd services/core-engine && bundle exec rails db:migrate)
-
-db-rollback: ## Rollback última migración en core-engine
-	$(COMPOSE_CMD) -f $(COMPOSE_FILE) exec core-engine bin/rails db:rollback || (cd services/core-engine && bundle exec rails db:rollback)
-
-db-reset: ## Drop, create y migrate (útil para desarrollo)
-	$(COMPOSE_CMD) -f $(COMPOSE_FILE) exec core-engine bin/rails db:drop db:create db:migrate || (cd services/core-engine && bundle exec rails db:drop db:create db:migrate)
-
-# --- Tests y calidad (equivalente a CI local) ---
-
-test: test-core test-workers ## Ejecutar todos los tests (core-engine RSpec + calculation-workers pytest)
-
-test-core: ## RSpec en core-engine
-	cd services/core-engine && bundle exec rspec --format documentation
-
-test-workers: ## pytest en calculation-workers
-	cd services/calculation-workers && pytest -v
-
-lint: lint-core lint-workers ## Lint de todo (RuboCop + ruff)
-
-lint-core: ## RuboCop en core-engine
-	cd services/core-engine && bundle exec rubocop --format simple
-
-lint-workers: ## ruff en calculation-workers
-	cd services/calculation-workers && pip install -q ruff && ruff check src/
-
-validate-asyncapi: ## Validar docs/asyncapi/events.yaml con AsyncAPI CLI
+# AsyncAPI (npx suele correr en host si no hay servicio Node)
+validate-asyncapi:
 	npx -y @asyncapi/cli@latest validate docs/asyncapi/events.yaml
-
-ci: lint test validate-asyncapi ## Réplica local del CI: lint + test + validate-asyncapi
-
-# --- Monitoreo / salud ---
-
-health: ## Comprobar que postgres, redis y (si está up) core-engine respondan
-	@echo "Postgres:" && (pg_isready -h localhost -p 5432 -U fisco 2>/dev/null || docker compose -f $(COMPOSE_FILE) exec -T postgres pg_isready -U fisco) && echo "  OK" || echo "  No disponible"
-	@echo "Redis:" && (redis-cli -h localhost -p 6379 ping 2>/dev/null | grep -q PONG || docker compose -f $(COMPOSE_FILE) exec -T redis redis-cli ping | grep -q PONG) && echo "  OK" || echo "  No disponible"
-	@echo "Core Engine (si está up):" && (curl -sf http://localhost:3000/up >/dev/null && echo "  OK" || echo "  No disponible o no levantado")
-
-# --- Limpieza ---
-
-clean: down ## Parar contenedores y quitar containers huérfanos
-	$(COMPOSE_CMD) -f $(COMPOSE_FILE) rm -f 2>/dev/null || true
-
-clean-volumes: down-v ## Alias de down-v (bajar y eliminar volúmenes)

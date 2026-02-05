@@ -1,0 +1,8 @@
+# frozen_string_literal: true
+
+# Fisco.io - Core Engine
+# Carga la aplicación y las tareas de Rake (db:migrate, etc.)
+
+require_relative "config/application"
+
+Rails.application.load_tasks
