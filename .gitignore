@@ -11,6 +11,7 @@ log/
 tmp/
 storage/
 .bundle/
+vendor/
 vendor/bundle/
 *.gem
 *.rbc
