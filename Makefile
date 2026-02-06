@@ -8,7 +8,7 @@ COMPOSE = docker compose
 CORE = $(COMPOSE) run --rm core-engine
 WORKERS = $(COMPOSE) run --rm calculation-workers
 
-.PHONY: help up down build build-core-engine restart restart-postgres restart-redis restart-redpanda restart-core-engine restart-calculation-workers logs logs-postgres logs-redis logs-redpanda logs-core-engine logs-calculation-workers bundle migrate seed seed-replant console routes test-db test-core test-workers test lint-core lint-workers lint validate-asyncapi pip-install
+.PHONY: help up down build build-core-engine restart restart-postgres restart-redis restart-redpanda restart-core-engine restart-calculation-workers logs logs-postgres logs-redis logs-redpanda logs-core-engine logs-calculation-workers bundle migrate seed seed-replant console routes test-db test-core test-workers test lint-core lint-workers lint validate-asyncapi validate-openapi pip-install
 
 .DEFAULT_GOAL := help
 
@@ -114,3 +114,6 @@ lint: lint-core lint-workers  ## Ejecutar lint en ambos servicios (RuboCop + ruf
 
 validate-asyncapi: ## Validar spec AsyncAPI con npx (requiere npx en el host)
 	npx -y @asyncapi/cli@latest validate docs/asyncapi/events.yaml
+
+validate-openapi: ## Validar spec OpenAPI con npx (requiere npx en el host)
+	npx -y @redocly/cli@latest lint docs/openapi/openapi.yaml

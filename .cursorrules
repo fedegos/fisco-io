@@ -126,7 +126,8 @@ end
 fisco-io/
 ├── docs/
 │   ├── adr/                  # Architecture Decision Records
-│   └── asyncapi/             # Event API spec (AsyncAPI - standard)
+│   ├── asyncapi/             # Event API spec (AsyncAPI - standard)
+│   └── openapi/              # REST API spec (OpenAPI)
 ├── services/
 │   ├── core-engine/          # Rails app - event store, aggregates
 │   │   ├── app/
@@ -156,14 +157,22 @@ fisco-io/
 ### Event API: AsyncAPI (Standard)
 - **AsyncAPI** is the standard for documenting all event-driven contracts in Fisco.io.
 - Every event type published or consumed (Kafka/Redpanda) MUST be defined in the AsyncAPI spec.
-- Location: `docs/asyncapi/` (e.g. `events.yaml` or `fisco-events.yaml`).
-- Include: server (Kafka/Redpanda), channels per bounded context (identity, obligations, payments, agents, etc.), message schemas for each event type (SubjectRegistered, TaxObligationCreated, PaymentReceived, etc.) with `data` and `metadata` payloads.
-- **New events:** when adding a new event type, update the AsyncAPI spec first; the spec is the contract for producers and consumers (core-engine, calculation-workers, future services).
-- **CI:** validate the AsyncAPI spec in the pipeline (e.g. AsyncAPI CLI or parser).
+- **Location**: `docs/asyncapi/` (e.g. `events.yaml`).
+- **Include**: server (Kafka/Redpanda), channels per bounded context, message schemas for each event type with `data` and `metadata` payloads.
+- **When to update**: Always when adding or modifying an event type (new event, new payload fields, new channel). Update the spec first; it is the contract for producers and consumers.
+- **CI:** validate the AsyncAPI spec in the pipeline (e.g. `make validate-asyncapi` or AsyncAPI CLI).
 - Bilingual: descriptions in Spanish with English translations where useful.
 
 ### REST API: OpenAPI
-- REST endpoints (commands, queries) are documented with OpenAPI (Phase 3).
+- REST endpoints (commands, queries) are documented with OpenAPI.
+- **Location**: `docs/openapi/` (e.g. `openapi.yaml`). Definir ubicación y esquema inicial si no existe; mantenerlo al día en cada cambio de API.
+- **When to update**: Always when adding or modifying an endpoint (POST commands, GET queries). Include paths, operations, request/response schemas, HTTP codes, and examples for main commands/queries.
+
+### ADRs (Architecture Decision Records)
+- **Location**: `docs/adr/` (e.g. `001-event-sourcing-choice.md`).
+- **When to create/update**: When the change implies a relevant architectural or design decision (new technology, structural pattern, consistency model change, external integration, etc.). Not required for every small feature.
+- **Content**: Context, Decision, Consequences (positive/negative), References; status Accepted/Deprecated/etc.
+- In each feature plan, include an item **"ADR (if applicable): …"** indicating whether a new ADR or update to an existing one is required.
 
 ## Domain Model (Tax Accounting)
 
@@ -313,19 +322,26 @@ CREATE INDEX idx_balances_tax_type ON tax_account_balances(tax_type);
 
 ## Development Workflow
 
-### 1. Feature Development (Event Storming First)
+### 1. TDD (Test-Driven Development)
+- **Red → Green → Refactor**: escribir el test que falla, implementar el mínimo para que pase, refactorizar.
+- **Orden**: tests primero (unitarios de dominio, luego handlers/proyecciones, luego integración/API si aplica); implementar código que haga pasar los tests; refactorizar manteniendo tests verdes.
+- **Niveles**: dominio (RSpec), event handlers y proyecciones, requests/API (integración). No saltar a implementación sin test que documente el comportamiento.
+- En cada ítem del plan de una feature, incluir explícitamente el paso **"Tests (TDD): …"** antes del paso de implementación.
+
+### 2. Feature Development (Event Storming First)
 ```
 1. Create event storming session doc in docs/domain/
 2. Identify events, commands, aggregates
-3. Write failing tests
-4. Implement domain logic (no infrastructure)
-5. Implement event handlers
-6. Implement projections
-7. Integration tests
-8. API endpoints (if needed)
+3. Tests (TDD): write failing tests for expected behaviour (domain, then handlers/projections, then API if needed)
+4. Implement domain logic (no infrastructure) until tests pass
+5. Implement event handlers and projections until tests pass
+6. Integration tests
+7. API endpoints (if needed)
+8. Update documentation (AsyncAPI for events, OpenAPI for endpoints, ADR if architectural decision)
 ```
+- **Checklist por feature**: ver [docs/feature-checklist.md](docs/feature-checklist.md) para TDD, AsyncAPI, OpenAPI y ADR en cada plan.
 
-### 2. Commit Message Convention
+### 3. Commit Message Convention
 ```
 type(scope): subject
 
@@ -349,7 +365,7 @@ Soporta transición de tasas prejudicial a judicial.
 Closes #42
 ```
 
-### 3. Testing Standards
+### 4. Testing Standards
 - **Unit Tests**: 100% coverage for domain logic
 - **Integration Tests**: All event handlers and projections
 - **E2E Tests**: Critical tax workflows

@@ -1,0 +1,310 @@
+# Fisco.io - REST API (OpenAPI)
+# Contratos de la API REST del core-engine / Core engine REST API contracts
+# Fuente de verdad para clientes (portales, integraciones). Actualizar en cada cambio de endpoint.
+
+openapi: 3.0.3
+
+info:
+  title: Fisco.io - REST API
+  version: 0.1.0
+  description: |
+    API REST del framework de administración tributaria Fisco.io.
+    Comandos (POST) y consultas (GET) sobre sujetos y obligaciones.
+    Actualizar este spec cuando se agregue o modifique un endpoint.
+
+servers:
+  - url: /api
+    description: API base path (relative to host)
+
+paths:
+  /subjects:
+    get:
+      summary: Listar sujetos
+      description: Lista todos los sujetos registrados (read model). Orden por fecha de creación descendente.
+      operationId: listSubjects
+      tags: [Subjects]
+      responses:
+        "200":
+          description: Lista de sujetos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Subject"
+    post:
+      summary: Registrar sujeto
+      description: Comando RegisterSubject. Registra un sujeto obligado (contribuyente, agente, etc.).
+      operationId: createSubject
+      tags: [Subjects]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSubjectRequest"
+      responses:
+        "201":
+          description: Sujeto creado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateSubjectResponse"
+        "400":
+          description: Parámetros inválidos
+
+  /obligations:
+    get:
+      summary: Listar obligaciones
+      description: Lista todas las obligaciones tributarias (read model). Orden por fecha de actualización descendente.
+      operationId: listObligations
+      tags: [Obligations]
+      responses:
+        "200":
+          description: Lista de obligaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Obligation"
+    post:
+      summary: Crear obligación tributaria
+      description: Comando CreateTaxObligation. Crea una obligación entre un sujeto y un tipo de impuesto.
+      operationId: createObligation
+      tags: [Obligations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateObligationRequest"
+      responses:
+        "201":
+          description: Obligación creada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateObligationResponse"
+        "400":
+          description: Parámetros inválidos
+
+  /obligations/{obligation_id}:
+    get:
+      summary: Obtener obligación
+      description: Consulta una obligación por ID (read model).
+      operationId: getObligation
+      tags: [Obligations]
+      parameters:
+        - name: obligation_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Obligación
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Obligation"
+        "404":
+          description: Obligación no encontrada
+
+  /obligations/{obligation_id}/liquidations:
+    post:
+      summary: Crear liquidación
+      description: Comando CreateLiquidation. Registra una liquidación para la obligación en un período.
+      operationId: createLiquidation
+      tags: [Obligations]
+      parameters:
+        - name: obligation_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLiquidationRequest"
+      responses:
+        "201":
+          description: Liquidación creada
+        "400":
+          description: Parámetros inválidos
+        "404":
+          description: Obligación no encontrada
+
+  /obligations/{obligation_id}/payments:
+    post:
+      summary: Registrar pago
+      description: Comando RegisterPayment. Registra un pago sobre la obligación.
+      operationId: createPayment
+      tags: [Obligations]
+      parameters:
+        - name: obligation_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentRequest"
+      responses:
+        "201":
+          description: Pago registrado
+        "400":
+          description: Parámetros inválidos
+        "404":
+          description: Obligación no encontrada
+
+  /obligations/{obligation_id}/determine:
+    post:
+      summary: Determinar obligación (inmobiliario)
+      description: Calcula y registra determinación para un año (impuesto inmobiliario). Servicio DetermineObligationForPeriod.
+      operationId: createDetermination
+      tags: [Obligations]
+      parameters:
+        - name: obligation_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [year]
+              properties:
+                year:
+                  type: integer
+                  description: Año fiscal
+      responses:
+        "201":
+          description: Determinación creada
+        "400":
+          description: Parámetros inválidos
+        "404":
+          description: Obligación no encontrada
+
+components:
+  schemas:
+    Subject:
+      type: object
+      properties:
+        subject_id:
+          type: string
+          format: uuid
+        tax_id:
+          type: string
+        legal_name:
+          type: string
+        trade_name:
+          type: string
+        status:
+          type: string
+        registration_date:
+          type: string
+          format: date
+
+    CreateSubjectRequest:
+      type: object
+      required: [tax_id, legal_name]
+      properties:
+        tax_id:
+          type: string
+        legal_name:
+          type: string
+        trade_name:
+          type: string
+
+    CreateSubjectResponse:
+      type: object
+      properties:
+        subject_id:
+          type: string
+          format: uuid
+
+    Obligation:
+      type: object
+      properties:
+        obligation_id:
+          type: string
+          format: uuid
+        subject_id:
+          type: string
+          format: uuid
+        tax_type:
+          type: string
+        current_balance:
+          type: number
+          format: double
+        principal_balance:
+          type: number
+          format: double
+        interest_balance:
+          type: number
+          format: double
+        last_liquidation_date:
+          type: string
+          format: date
+        last_payment_date:
+          type: string
+          format: date
+
+    CreateObligationRequest:
+      type: object
+      required: [primary_subject_id, tax_type]
+      properties:
+        obligation_id:
+          type: string
+          format: uuid
+          description: Opcional; se genera UUID si no se envía
+        primary_subject_id:
+          type: string
+          format: uuid
+        tax_type:
+          type: string
+        role:
+          type: string
+          default: contribuyente
+
+    CreateObligationResponse:
+      type: object
+      properties:
+        obligation_id:
+          type: string
+          format: uuid
+
+    CreateLiquidationRequest:
+      type: object
+      required: [period, tax_amount]
+      properties:
+        period:
+          type: string
+          description: Período fiscal (ej. 2024-01)
+        tax_amount:
+          type: number
+          format: double
+
+    CreatePaymentRequest:
+      type: object
+      required: [amount]
+      properties:
+        amount:
+          type: number
+          format: double
+        paid_at:
+          type: string
+          format: date-time
