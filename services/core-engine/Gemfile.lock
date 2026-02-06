@@ -152,6 +152,8 @@ GEM
     psych (5.3.1)
       date
       stringio
+    puma (6.6.1)
+      nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
     rack (3.2.4)
@@ -262,6 +264,7 @@ DEPENDENCIES
   debug
   good_job (~> 4.0)
   pg (~> 1.5)
+  puma (~> 6.0)
   rails (~> 8.0)
   redis (~> 5.0)
   rspec-rails (~> 7.0)

@@ -76,6 +76,21 @@ You are an expert software architect specializing in event-driven systems, domai
 - Functional programming style preferred for calculations
 - Use pytest for testing
 
+### Frontend y UX (Rails + HTMX)
+- **Responsive desde el primer momento**: diseño mobile-first; usar variables CSS (espaciado, colores, breakpoints) y media queries para tablet/desktop.
+- **Layout único**: barra de navegación consistente (Contribuyente / Operadores), contenedor de contenido con ancho máximo, flashes visibles.
+- **Estilos**: hoja global en `public/stylesheets/application.css`; clases semánticas (BEM-light: `.app-nav`, `.page-container`, `.card`). Evitar estilos inline; preferir variables CSS (`:root`) para tema.
+- **Listas y datos**: preferir **tarjetas (cards) responsive con badges** en lugar de tablas; **edición en línea** e **formularios modales** para crear/editar en vez de páginas dedicadas. Si se usan tablas, envolver en `.table-wrapper` con `overflow-x: auto`; `<th scope="col">` y estado vacío claro.
+- **Paginación**: preferir **scroll infinito** a paginado (HTMX `hx-trigger="revealed"` o similar, con indicador de carga al final).
+- **Filtros y búsqueda**: las vistas de listas deben tener **filtros razonables para el dominio** (ej. por tipo de impuesto, estado, período) y **búsqueda libre** (texto); todo con **carga interactiva** (HTMX, sin recarga completa).
+- **Estados de carga**: incluir **skeletons** (placeholders animados) para las cargas interactivas; evitar pantallas en blanco o spinners genéricos cuando el retraso sea perceptible.
+- **Accesibilidad**: landmarks (`nav`, `main`), `aria-label` donde aporte, contraste suficiente, foco visible (`:focus-visible`), respetar `prefers-reduced-motion` cuando aplique.
+- **HTMX**: usar para recargas parciales, formularios modales y scroll infinito; mantener estructura accesible y mensajes de estado (loading/error) cuando aplique.
+
+### Operadores vs Agentes (terminología)
+- **Operadores**: en este proyecto se refiere al **personal interno del fisco** (staff) que configura impuestos, gestiona padrón, verifica montos y consulta deudas. Rutas y portal bajo `/operadores` y namespace `Operadores`.
+- **Agentes** (en el dominio): son **sujetos obligados externos** (agentes de recaudación, agentes de información). No confundir con operadores; en código y UI usar "operador" para el portal interno y "agente" solo para el rol tributario (collection_agent, etc.).
+
 ### Naming Conventions
 
 #### Events (Past Tense + Domain + Action)

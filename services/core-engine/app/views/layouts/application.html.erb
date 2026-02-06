@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= content_for(:title) || "Fisco.io" %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/stylesheets/application.css">
+  <script src="https://unpkg.com/htmx.org@1.9.10" crossorigin="anonymous"></script>
+  <%= csrf_meta_tags %>
+  <%= content_for(:head) %>
+</head>
+<body>
+  <div class="app-wrapper">
+    <nav class="app-nav" role="navigation" aria-label="Principal">
+      <%= link_to "Fisco.io", root_path, class: "app-nav__brand" %>
+      <div class="app-nav__links">
+        <%= link_to "Contribuyente", contribuyente_obligaciones_path, class: "app-nav__link #{request.path.start_with?('/contribuyente') ? 'app-nav__link--active' : ''}" %>
+        <%= link_to "Operadores", operadores_root_path, class: "app-nav__link #{request.path.start_with?('/operadores') ? 'app-nav__link--active' : ''}" %>
+      </div>
+    </nav>
+
+    <main class="app-main" id="main-content">
+      <% if flash[:notice].present? %>
+        <div class="flash flash--notice" role="status"><%= flash[:notice] %></div>
+      <% end %>
+      <% if flash[:alert].present? %>
+        <div class="flash flash--alert" role="alert"><%= flash[:alert] %></div>
+      <% end %>
+      <%= yield %>
+    </main>
+  </div>
+</body>
+</html>

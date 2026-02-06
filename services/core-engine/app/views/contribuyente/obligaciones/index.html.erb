@@ -1,0 +1,35 @@
+<% content_for :title, "Obligaciones - Fisco.io" %>
+
+<div class="page-container">
+  <header class="page-header">
+    <h1 class="page-title">Obligaciones</h1>
+    <p class="page-subtitle">Sus obligaciones tributarias y saldos actuales.</p>
+  </header>
+
+  <div class="table-wrapper">
+    <table class="table" role="grid" aria-label="Listado de obligaciones">
+      <thead>
+        <tr>
+          <th scope="col">Obligación</th>
+          <th scope="col">Tipo</th>
+          <th scope="col">Saldo actual</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @obligaciones.any? %>
+          <% @obligaciones.each do |ob| %>
+            <tr>
+              <td><%= ob.obligation_id %></td>
+              <td><%= ob.tax_type %></td>
+              <td><%= number_to_currency(ob.current_balance) %></td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="3" class="empty-state">No hay obligaciones.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

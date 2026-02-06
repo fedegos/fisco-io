@@ -56,7 +56,7 @@ services:
       - "3000:3000"
     volumes:
       - ./services/core-engine:/app
-    command: bundle exec rails server -b 0.0.0.0
+    command: sh -c "rm -f tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0"
 
   calculation-workers:
     build:
