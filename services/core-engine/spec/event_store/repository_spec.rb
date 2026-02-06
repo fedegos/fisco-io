@@ -4,11 +4,6 @@
 # Roundtrip: append eventos, load agregado y verificar estado
 
 require "rails_helper"
-require "app/event_store/repository"
-require "app/event_store/rehydrated_event"
-require "app/aggregates/base_aggregate"
-require "app/modules/identity/subject"
-require "app/modules/identity/events/subject_registered"
 
 RSpec.describe EventStore::Repository do
   let(:repository) { described_class.new }

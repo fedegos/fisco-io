@@ -8,6 +8,11 @@ require "spec_helper"
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 
+# Cargar event store explícitamente (Zeitwerk en test puede no autoloadear bajo app/event_store)
+require_relative "../app/event_store/repository"
+require_relative "../app/event_store/event_bus"
+require_relative "../app/event_store/rehydrated_event"
+
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 
 require "rspec/rails"

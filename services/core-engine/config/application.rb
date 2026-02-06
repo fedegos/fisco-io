@@ -17,5 +17,8 @@ module CoreEngine
     config.load_defaults 8.0
     config.autoload_lib(ignore: %w[assets tasks])
     config.api_only = true
+
+    # Incluir app/ para que Zeitwerk cargue event_store, modules, etc.
+    config.autoload_paths << Rails.root.join("app")
   end
 end
