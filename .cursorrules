@@ -475,27 +475,28 @@ Identity::Subject.find(obligation.subject_id)
 ## MVP Scope (First 3 Months)
 
 ### Phase 1: Core Event Store (Month 1)
-- [ ] Event store schema and repository
+- [x] Event store schema and repository
 - [ ] Event bus with Kafka
-- [ ] Basic aggregate framework
-- [ ] Command/Event base classes
-- [ ] Simple projection engine
+- [x] Basic aggregate framework
+- [x] Command/Event base classes
+- [x] Simple projection engine
 
 ### Phase 2: Tax Obligation Aggregate (Month 2)
-- [ ] TaxObligation aggregate
-- [ ] Commands: CreateLiquidation, RegisterPayment
-- [ ] Events: TaxLiquidationCreated, PaymentReceived
-- [ ] Balance projection
+- [x] TaxObligation aggregate
+- [x] Commands: CreateLiquidation, RegisterPayment
+- [x] Events: TaxLiquidationCreated, PaymentReceived
+- [x] Balance projection
 - [ ] Transaction history projection
 
 ### Phase 3: API & Demo (Month 3)
-- [ ] REST API for commands
-- [ ] Query API for projections
+- [x] REST API for commands
+- [x] Query API for projections
 - [ ] OpenAPI documentation
 - [ ] AsyncAPI documentation for event contracts (Kafka channels and messages)
-- [ ] Docker Compose setup
+- [x] Docker Compose setup
 - [ ] Demo deployment on Railway
-- [ ] Sample data seeds
+- [x] Sample data seeds
+- [ ] Visualización de eventos, comandos y queries en la interfaz de operador
 
 ## Future Roadmap
 
@@ -505,6 +506,7 @@ Identity::Subject.find(obligation.subject_id)
 - [ ] Advanced projections (aging, forecasting)
 - [ ] Multi-jurisdiction configuration
 - [ ] Snapshots implementation
+- [ ] Módulo de configuración de determinaciones para impuesto inmobiliario (multi-año, base imponible configurable, tabla de alícuotas por tramo, motor de cálculo)
 
 ### V2.0 (Months 7-12)
 - [ ] ML risk scoring

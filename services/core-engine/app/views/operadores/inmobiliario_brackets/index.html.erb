@@ -1,0 +1,39 @@
+<% content_for :title, "Tramos alicuotas #{@year} - Operadores - Fisco.io" %>
+<div class="page-container">
+  <header class="page-header">
+    <h1 class="page-title">Tramos de alicuotas - Ano <%= @year %></h1>
+    <p class="page-subtitle">Base desde-hasta, tasa % y monto minimo por tramo.</p>
+  </header>
+  <p>
+    <%= link_to "Volver a configuracion", operadores_inmobiliario_configs_path %> |
+    <%= link_to "Nuevo tramo", operadores_new_inmobiliario_bracket_path(@year) %>
+  </p>
+  <div class="table-wrapper">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Base desde</th>
+          <th scope="col">Base hasta</th>
+          <th scope="col">Alicuota %</th>
+          <th scope="col">Monto minimo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @brackets.any? %>
+          <% @brackets.each do |b| %>
+            <tr>
+              <td><%= number_with_delimiter(b.base_from) %></td>
+              <td><%= number_with_delimiter(b.base_to) %></td>
+              <td><%= b.rate_pct %>%</td>
+              <td><%= number_to_currency(b.minimum_amount) %></td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="4" class="empty-state">No hay tramos. Agregue al menos uno.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

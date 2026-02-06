@@ -8,7 +8,7 @@ COMPOSE = docker compose
 CORE = $(COMPOSE) run --rm core-engine
 WORKERS = $(COMPOSE) run --rm calculation-workers
 
-.PHONY: help up down build build-core-engine restart restart-postgres restart-redis restart-redpanda restart-core-engine restart-calculation-workers logs logs-postgres logs-redis logs-redpanda logs-core-engine logs-calculation-workers bundle migrate console routes test-db test-core test-workers test lint-core lint-workers lint validate-asyncapi pip-install
+.PHONY: help up down build build-core-engine restart restart-postgres restart-redis restart-redpanda restart-core-engine restart-calculation-workers logs logs-postgres logs-redis logs-redpanda logs-core-engine logs-calculation-workers bundle migrate seed seed-replant console routes test-db test-core test-workers test lint-core lint-workers lint validate-asyncapi pip-install
 
 .DEFAULT_GOAL := help
 
@@ -75,6 +75,12 @@ bundle: ## bundle install en core-engine (instala gems; usa vendor/bundle si est
 
 migrate: ## Ejecutar migraciones de Rails (entorno development)
 	$(CORE) bundle exec rails db:migrate
+
+seed: ## Cargar datos de demo (sujetos, obligaciones, liquidaciones, pagos)
+	$(CORE) bundle exec rails db:seed
+
+seed-replant: ## Borrar datos de demo y volver a cargar db:seed (replant)
+	$(CORE) bundle exec rails db:seed:replant
 
 console: ## Abrir consola Rails en el contenedor core-engine
 	$(CORE) bundle exec rails console

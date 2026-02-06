@@ -8,5 +8,11 @@
 
   <div class="card">
     <p>Desde aquí podrá configurar impuestos, gestionar el padrón de objetos y verificar montos y estado de deudas.</p>
+    <ul style="margin: var(--space-md) 0 0; padding-left: 1.25rem;">
+      <li><%= link_to "Eventos (event store)", operadores_eventos_path %></li>
+      <li><%= link_to "Comandos", operadores_comandos_path %></li>
+      <li><%= link_to "Consultas (read models)", operadores_consultas_path %></li>
+      <li><%= link_to "Configuración inmobiliario", operadores_inmobiliario_configs_path %></li>
+    </ul>
   </div>
 </div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 3) do
+ActiveRecord::Schema[8.1].define(version: 6) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -28,6 +28,38 @@ ActiveRecord::Schema[8.1].define(version: 3) do
     t.index ["created_at"], name: "idx_events_created_at"
     t.index ["event_type"], name: "idx_events_type"
     t.index ["sequence_number"], name: "idx_events_sequence"
+  end
+
+  create_table "fiscal_valuations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.uuid "obligation_id", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "value", precision: 15, scale: 2, null: false
+    t.integer "year", null: false
+    t.index ["obligation_id", "year"], name: "idx_fiscal_valuations_oblig_year", unique: true
+  end
+
+  create_table "inmobiliario_determination_configs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "formula_base_expression", default: "valuacion * 1.0", null: false
+    t.integer "installments_per_year", default: 4, null: false
+    t.string "tax_type", default: "inmobiliario", null: false
+    t.datetime "updated_at", null: false
+    t.integer "year", null: false
+    t.index ["tax_type", "year"], name: "idx_inmob_config_tax_year", unique: true
+  end
+
+  create_table "inmobiliario_rate_brackets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.decimal "base_from", precision: 15, scale: 2, default: "0.0", null: false
+    t.decimal "base_to", precision: 15, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.decimal "minimum_amount", precision: 15, scale: 2, default: "0.0", null: false
+    t.integer "position", default: 0, null: false
+    t.decimal "rate_pct", precision: 8, scale: 4, null: false
+    t.string "tax_type", default: "inmobiliario", null: false
+    t.datetime "updated_at", null: false
+    t.integer "year", null: false
+    t.index ["tax_type", "year"], name: "idx_inmob_brackets_tax_year"
   end
 
   create_table "snapshots", primary_key: "aggregate_id", id: :uuid, default: nil, force: :cascade do |t|

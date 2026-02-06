@@ -1,0 +1,22 @@
+<% content_for :title, "Comandos - Operadores - Fisco.io" %>
+
+<div class="page-container">
+  <header class="page-header">
+    <h1 class="page-title">Catálogo de comandos</h1>
+    <p class="page-subtitle">Comandos del dominio disponibles (agregado y parámetros). Solo documentación.</p>
+  </header>
+
+  <div class="card-grid" role="list">
+    <% @comandos.each do |cmd| %>
+      <article class="card card--event" role="listitem">
+        <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center; margin-bottom: var(--space-sm);">
+          <span class="badge"><%= cmd[:name] %></span>
+          <span class="badge badge--muted"><%= cmd[:aggregate] %></span>
+        </div>
+        <p style="margin: 0; font-size: 0.875rem; color: var(--color-text-muted);">
+          Parámetros: <code style="font-size: 0.8rem;"><%= cmd[:params].join(", ") %></code>
+        </p>
+      </article>
+    <% end %>
+  </div>
+</div>

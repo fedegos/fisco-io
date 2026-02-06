@@ -1,0 +1,72 @@
+<% content_for :title, "Eventos - Operadores - Fisco.io" %>
+
+<div class="page-container">
+  <header class="page-header">
+    <h1 class="page-title">Stream de eventos</h1>
+    <p class="page-subtitle">Event store (solo lectura). Filtros por tipo, agregado y rango.</p>
+  </header>
+
+  <%= form_with url: operadores_eventos_path, method: :get, local: true, class: "filters-bar" do |f| %>
+    <label>
+      Tipo de evento
+      <select name="event_type" aria-label="Filtrar por tipo de evento">
+        <option value="">— Todos —</option>
+        <% @event_types.each do |et| %>
+          <option value="<%= et %>" <%= "selected" if params[:event_type] == et %>><%= et %></option>
+        <% end %>
+      </select>
+    </label>
+    <label>
+      Tipo de agregado
+      <select name="aggregate_type" aria-label="Filtrar por tipo de agregado">
+        <option value="">— Todos —</option>
+        <% @aggregate_types.each do |at| %>
+          <option value="<%= at %>" <%= "selected" if params[:aggregate_type] == at %>><%= at %></option>
+        <% end %>
+      </select>
+    </label>
+    <label>
+      Desde fecha
+      <input type="date" name="from_date" value="<%= params[:from_date] %>" aria-label="Desde fecha" />
+    </label>
+    <label>
+      Hasta fecha
+      <input type="date" name="to_date" value="<%= params[:to_date] %>" aria-label="Hasta fecha" />
+    </label>
+    <label>
+      Sequence desde
+      <input type="number" name="from_sequence" value="<%= params[:from_sequence] %>" placeholder="opcional" min="1" aria-label="Sequence desde" />
+    </label>
+    <label>
+      Sequence hasta
+      <input type="number" name="to_sequence" value="<%= params[:to_sequence] %>" placeholder="opcional" min="1" aria-label="Sequence hasta" />
+    </label>
+    <button type="submit">Filtrar</button>
+  <% end %>
+
+  <div class="card-grid" role="list">
+    <% if @eventos.any? %>
+      <% @eventos.each do |ev| %>
+        <article class="card card--event" role="listitem">
+          <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center; margin-bottom: var(--space-sm);">
+            <span class="badge"><%= ev.event_type %></span>
+            <span class="badge badge--muted"><%= ev.aggregate_type %></span>
+            <span class="badge badge--muted">v<%= ev.event_version %> · #<%= ev.sequence_number %></span>
+          </div>
+          <p style="margin: 0 0 var(--space-sm); font-size: 0.875rem; color: var(--color-text-muted);">
+            <code style="font-size: 0.8rem;"><%= ev.aggregate_id %></code>
+          </p>
+          <p style="margin: 0; font-size: 0.8125rem; color: var(--color-text-muted);">
+            <%= l(ev.created_at, format: :long) %>
+          </p>
+          <details style="margin-top: var(--space-sm);">
+            <summary style="cursor: pointer; font-size: 0.875rem;">Ver data (JSON)</summary>
+            <pre style="margin: var(--space-sm) 0 0; padding: var(--space-md); background: var(--color-bg); border-radius: var(--radius-md); font-size: 0.75rem; overflow-x: auto;"><%= JSON.pretty_generate(ev.data || {}) %></pre>
+          </details>
+        </article>
+      <% end %>
+    <% else %>
+      <p class="empty-state">No hay eventos que coincidan con los filtros.</p>
+    <% end %>
+  </div>
+</div>
