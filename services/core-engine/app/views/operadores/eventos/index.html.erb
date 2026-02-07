@@ -2,8 +2,8 @@
 
 <div class="page-container">
   <header class="page-header">
-    <h1 class="page-title">Stream de eventos</h1>
-    <p class="page-subtitle">Event store (solo lectura). Filtros por tipo, agregado y rango.</p>
+    <h1 class="page-title">Secuencia de eventos</h1>
+    <p class="page-subtitle">Almacén de eventos (solo lectura). Filtros por tipo, agregado y rango.</p>
   </header>
 
   <%= form_with url: operadores_eventos_path, method: :get, local: true, class: "filters-bar" do |f| %>
@@ -34,12 +34,12 @@
       <input type="date" name="to_date" value="<%= params[:to_date] %>" aria-label="Hasta fecha" />
     </label>
     <label>
-      Sequence desde
-      <input type="number" name="from_sequence" value="<%= params[:from_sequence] %>" placeholder="opcional" min="1" aria-label="Sequence desde" />
+      Secuencia desde
+      <input type="number" name="from_sequence" value="<%= params[:from_sequence] %>" placeholder="opcional" min="1" aria-label="Secuencia desde" />
     </label>
     <label>
-      Sequence hasta
-      <input type="number" name="to_sequence" value="<%= params[:to_sequence] %>" placeholder="opcional" min="1" aria-label="Sequence hasta" />
+      Secuencia hasta
+      <input type="number" name="to_sequence" value="<%= params[:to_sequence] %>" placeholder="opcional" min="1" aria-label="Secuencia hasta" />
     </label>
     <button type="submit">Filtrar</button>
   <% end %>
@@ -48,20 +48,20 @@
     <% if @eventos.any? %>
       <% @eventos.each do |ev| %>
         <article class="card card--event" role="listitem">
-          <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center; margin-bottom: var(--space-sm);">
+          <div class="meta-row">
             <span class="badge"><%= ev.event_type %></span>
             <span class="badge badge--muted"><%= ev.aggregate_type %></span>
             <span class="badge badge--muted">v<%= ev.event_version %> · #<%= ev.sequence_number %></span>
           </div>
-          <p style="margin: 0 0 var(--space-sm); font-size: 0.875rem; color: var(--color-text-muted);">
-            <code style="font-size: 0.8rem;"><%= ev.aggregate_id %></code>
+          <p class="meta-line text-small text-muted">
+            <code class="code--xs"><%= ev.aggregate_id %></code>
           </p>
-          <p style="margin: 0; font-size: 0.8125rem; color: var(--color-text-muted);">
+          <p class="text-tiny text-muted">
             <%= l(ev.created_at, format: :long) %>
           </p>
-          <details style="margin-top: var(--space-sm);">
-            <summary style="cursor: pointer; font-size: 0.875rem;">Ver data (JSON)</summary>
-            <pre style="margin: var(--space-sm) 0 0; padding: var(--space-md); background: var(--color-bg); border-radius: var(--radius-md); font-size: 0.75rem; overflow-x: auto;"><%= JSON.pretty_generate(ev.data || {}) %></pre>
+          <details class="details-block">
+            <summary>Ver datos (JSON)</summary>
+            <pre><%= JSON.pretty_generate(ev.data || {}) %></pre>
           </details>
         </article>
       <% end %>

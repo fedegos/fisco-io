@@ -54,4 +54,59 @@ RSpec.describe JurisdictionConfig do
       expect(config.tax_type_config("impuesto_fantasma")).to be_nil
     end
   end
+
+  describe "#external_id_config" do
+    let(:config) { described_class.for(:arba) }
+
+    before { skip "archivo config/jurisdictions/arba.yml requerido" unless config }
+
+    it "devuelve label y regex para inmobiliario (partido-partida)" do
+      ext = config.external_id_config("inmobiliario")
+      expect(ext).to be_a(Hash)
+      expect(ext["label"]).to eq("Partido-Partida")
+      expect(Regexp.new(ext["regex"]).match?("12-34567")).to be true
+    end
+
+    it "devuelve label y regex para ingresos_brutos (CUIT)" do
+      ext = config.external_id_config("ingresos_brutos")
+      expect(ext["label"]).to eq("CUIT")
+      expect(Regexp.new(ext["regex"]).match?("20-12345678-9")).to be true
+    end
+
+    it "devuelve nil para tax_type sin external_id configurado" do
+      expect(config.external_id_config("impuesto_fantasma")).to be_nil
+    end
+  end
+
+  describe ".validate_external_id" do
+    it "acepta external_id vacío" do
+      ok, err = described_class.validate_external_id(tax_type: "inmobiliario", external_id: nil)
+      expect(ok).to be true
+      expect(err).to be_nil
+    end
+
+    it "valida partido-partida para inmobiliario" do
+      ok, err = described_class.validate_external_id(tax_type: "inmobiliario", external_id: "12-34567")
+      expect(ok).to be true
+      expect(err).to be_nil
+    end
+
+    it "rechaza partido-partida inválido para inmobiliario" do
+      ok, err = described_class.validate_external_id(tax_type: "inmobiliario", external_id: "abc-xyz")
+      expect(ok).to be false
+      expect(err).to include("Partido-Partida")
+    end
+
+    it "valida CUIT para ingresos_brutos" do
+      ok, err = described_class.validate_external_id(tax_type: "ingresos_brutos", external_id: "20-12345678-9")
+      expect(ok).to be true
+      expect(err).to be_nil
+    end
+
+    it "rechaza CUIT inválido para ingresos_brutos" do
+      ok, err = described_class.validate_external_id(tax_type: "ingresos_brutos", external_id: "123")
+      expect(ok).to be false
+      expect(err).to include("CUIT")
+    end
+  end
 end

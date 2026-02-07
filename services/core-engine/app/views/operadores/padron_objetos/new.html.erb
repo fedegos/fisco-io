@@ -1,0 +1,31 @@
+<% content_for :title, "Alta de obligación - Operadores - Fisco.io" %>
+<div class="page-container">
+  <header class="page-header">
+    <p class="page-subtitle"><%= link_to "Padrón de objetos", operadores_padron_objetos_path %> - Alta</p>
+    <h1 class="page-title">Alta de obligación</h1>
+  </header>
+  <div class="card">
+    <%= form_with model: @obligacion, url: operadores_padron_objetos_path, method: :post, local: true do |f| %>
+      <div class="form-field">
+        <%= f.label :subject_id, "ID del sujeto (UUID)" %>
+        <%= f.text_field :subject_id, class: "form-input", required: true %>
+      </div>
+      <div class="form-field">
+        <%= f.label :tax_type, "Tipo de impuesto" %>
+        <%= f.select :tax_type, options_for_select([["inmobiliario", "inmobiliario"], ["ingresos_brutos", "ingresos_brutos"]], @obligacion.tax_type), {}, class: "form-input" %>
+      </div>
+      <div class="form-field">
+        <%= f.label :role, "Rol" %>
+        <%= f.select :role, options_for_select([["contribuyente", "contribuyente"], ["agente_recaudacion", "agente_recaudacion"]], @obligacion.role), {}, class: "form-input" %>
+      </div>
+      <div class="form-field">
+        <%= f.label :external_id, "Identificador externo (opcional)" %>
+        <%= f.text_field :external_id, class: "form-input" %>
+      </div>
+      <div class="form-actions">
+        <%= f.submit "Crear obligación", class: "btn btn--primary" %>
+        <%= link_to "Cancelar", operadores_padron_objetos_path, class: "btn btn--secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

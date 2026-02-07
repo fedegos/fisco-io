@@ -20,7 +20,8 @@ module Api
         obligation_id: obligation_id,
         primary_subject_id: params.require(:primary_subject_id),
         tax_type: params.require(:tax_type),
-        role: params[:role].presence || "contribuyente"
+        role: params[:role].presence || "contribuyente",
+        external_id: params[:external_id].presence
       )
       result = Obligations::Handlers::CreateTaxObligationHandler.new.call(cmd)
       render json: { obligation_id: result[:obligation_id] }, status: :created
@@ -35,6 +36,7 @@ module Api
     def obligation_json(record)
       {
         obligation_id: record.obligation_id,
+        external_id: record.external_id,
         subject_id: record.subject_id,
         tax_type: record.tax_type,
         current_balance: record.current_balance.to_f,

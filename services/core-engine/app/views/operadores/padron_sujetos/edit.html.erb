@@ -1,0 +1,29 @@
+<% content_for :title, "Editar sujeto - Operadores - Fisco.io" %>
+<div class="page-container">
+  <header class="page-header">
+    <p class="page-subtitle"><%= link_to "Padrón de sujetos", operadores_padron_sujetos_path %> → Editar</p>
+    <h1 class="page-title">Editar sujeto</h1>
+    <p class="page-subtitle id-internal">ID: <%= @sujeto.subject_id %></p>
+  </header>
+  <div class="card">
+    <%= form_with model: @sujeto, url: operadores_padron_sujeto_path(@sujeto.subject_id), method: :patch, local: true do |f| %>
+      <div class="form-field">
+        <%= f.label :tax_id, "CUIT / N.º fiscal" %>
+        <%= f.text_field :tax_id, class: "form-input", disabled: true %>
+        <p class="form-field__hint">No editable (identificador fiscal).</p>
+      </div>
+      <div class="form-field">
+        <%= f.label :legal_name, "Razón social" %>
+        <%= f.text_field :legal_name, class: "form-input", required: true %>
+      </div>
+      <div class="form-field">
+        <%= f.label :trade_name, "Nombre de fantasía" %>
+        <%= f.text_field :trade_name, class: "form-input" %>
+      </div>
+      <div class="form-actions">
+        <%= f.submit "Guardar", class: "btn btn--primary" %>
+        <%= link_to "Cancelar", operadores_padron_sujetos_path, class: "btn btn--secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

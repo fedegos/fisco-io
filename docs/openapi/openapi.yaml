@@ -166,6 +166,31 @@ paths:
         "404":
           description: Obligación no encontrada
 
+  /obligations/{obligation_id}/movements:
+    get:
+      summary: Movimientos de cuenta corriente
+      description: Lista de movimientos (débitos y créditos) de la obligación. Orden cronológico.
+      operationId: listMovements
+      tags: [Obligations]
+      parameters:
+        - name: obligation_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Lista de movimientos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Movement"
+        "404":
+          description: Obligación no encontrada
+
   /obligations/{obligation_id}/determine:
     post:
       summary: Determinar obligación (inmobiliario)
@@ -242,6 +267,9 @@ components:
         obligation_id:
           type: string
           format: uuid
+        external_id:
+          type: string
+          description: Identificador mostrable por tipo de impuesto (partido-partida, CUIT, patente). No mostrar UUID a sujetos externos.
         subject_id:
           type: string
           format: uuid
@@ -279,6 +307,9 @@ components:
         role:
           type: string
           default: contribuyente
+        external_id:
+          type: string
+          description: Identificador mostrable (partido-partida, CUIT, patente). Validado por regex según tax_type en jurisdicción.
 
     CreateObligationResponse:
       type: object
@@ -308,3 +339,29 @@ components:
         paid_at:
           type: string
           format: date-time
+
+    Movement:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        obligation_id:
+          type: string
+          format: uuid
+        movement_type:
+          type: string
+          enum: [liquidation, payment, interest, other]
+        amount:
+          type: number
+          format: double
+        debit_credit:
+          type: string
+          enum: [debit, credit]
+        movement_date:
+          type: string
+          format: date
+        period:
+          type: string
+        reference:
+          type: string

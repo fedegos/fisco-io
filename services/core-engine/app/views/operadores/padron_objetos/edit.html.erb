@@ -1,0 +1,21 @@
+<% content_for :title, "Editar obligación - Operadores - Fisco.io" %>
+<div class="page-container">
+  <header class="page-header">
+    <p class="page-subtitle"><%= link_to "Padrón de objetos", operadores_padron_objetos_path %> → <%= link_to @obligacion.display_id, operadores_padron_objeto_path(@obligacion.obligation_id) %> → Editar</p>
+    <h1 class="page-title">Editar obligación</h1>
+    <p class="page-subtitle id-internal">ID: <%= @obligacion.obligation_id %></p>
+  </header>
+  <div class="card">
+    <%= form_with model: @obligacion, url: operadores_padron_objeto_path(@obligacion.obligation_id), method: :patch, local: true do |f| %>
+      <div class="form-field">
+        <%= f.label :external_id, "Identificador externo" %>
+        <%= f.text_field :external_id, class: "form-input" %>
+        <p class="form-field__hint">Sujeto y tipo de impuesto no son editables.</p>
+      </div>
+      <div class="form-actions">
+        <%= f.submit "Guardar", class: "btn btn--primary" %>
+        <%= link_to "Cancelar", operadores_padron_objeto_path(@obligacion.obligation_id), class: "btn btn--secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

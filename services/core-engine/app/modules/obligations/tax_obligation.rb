@@ -43,6 +43,17 @@ module Obligations
       @account = TaxAccount.new(obligation_id: d["obligation_id"])
     end
 
+    def apply_TaxObligationUpdated(event)
+      d = event.data
+      # Only external_id is projected; aggregate could hold more if needed
+    end
+
+    def apply_TaxObligationClosed(event)
+      d = event.data
+      @status = "closed"
+      @closed_at = d["closed_at"]
+    end
+
     def apply_TaxLiquidationCreated(_event)
       # TODO: actualizar account
     end

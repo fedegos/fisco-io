@@ -1,0 +1,71 @@
+<% content_for :title, "Objeto #{@obligacion.display_id} - Operadores - Fisco.io" %>
+<div class="page-container">
+  <header class="page-header">
+    <p class="page-subtitle"><%= link_to "Padrón de objetos", operadores_padron_objetos_path %> → Detalle</p>
+    <h1 class="page-title">Objeto <%= @obligacion.display_id %></h1>
+    <p class="page-subtitle">
+      <span class="badge badge--muted"><%= @obligacion.tax_type %></span>
+      <% if @obligacion.respond_to?(:status) && @obligacion.status.present? %>
+        <span class="badge <%= @obligacion.status == 'closed' ? 'badge--muted' : 'badge--success' %>"><%= @obligacion.status == "closed" ? "Cerrada" : "Abierta" %></span>
+      <% end %>
+      <span class="id-internal">ID: <%= @obligacion.obligation_id %></span>
+    </p>
+  </header>
+
+  <p class="page-actions">
+    <%= link_to "Editar", operadores_edit_padron_objeto_path(@obligacion.obligation_id), class: "btn btn--secondary" %>
+    <%= link_to "Cuenta corriente", operadores_obligacion_path(@obligacion.obligation_id), class: "btn btn--secondary" %>
+    <% if !@obligacion.respond_to?(:status) || @obligacion.status != "closed" %>
+      <%= button_to "Cerrar obligación", operadores_cerrar_padron_objeto_path(@obligacion.obligation_id), method: :patch, form: { data: { confirm: "¿Cerrar esta obligación?" } }, class: "btn btn--secondary" %>
+    <% end %>
+  </p>
+
+  <section class="card card--spaced">
+    <h2 class="card__title card__title--sm">Saldo actual</h2>
+    <p class="balance-amount"><%= number_to_currency(@obligacion.current_balance) %></p>
+  </section>
+
+  <section class="card card--spaced">
+    <h2 class="card__title">Valuaciones fiscales por período</h2>
+    <p class="card__description">Carga o edita la valuación fiscal por año para el cálculo inmobiliario.</p>
+    <%= form_with url: operadores_padron_objeto_valuaciones_path(@obligacion.obligation_id), method: :post, local: true do |f| %>
+      <div class="valuacion-form-row form-field">
+        <div class="form-field">
+          <label for="year" class="form-field__label">Año</label>
+          <input type="number" name="year" id="year" min="2001" max="2100" value="<%= Date.current.year %>" class="form-input form-input--narrow" required />
+        </div>
+        <div class="form-field">
+          <label for="value" class="form-field__label">Valor</label>
+          <input type="number" name="value" id="value" min="0" step="0.01" class="form-input form-input--number" required />
+        </div>
+        <div class="form-field">
+          <%= f.submit "Guardar valuación", class: "btn btn--primary" %>
+        </div>
+      </div>
+    <% end %>
+    <div class="table-wrapper valuacion-table">
+      <table class="table" role="grid" aria-label="Valuaciones por año">
+        <thead>
+          <tr>
+            <th scope="col">Año</th>
+            <th scope="col">Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if @valuaciones.any? %>
+            <% @valuaciones.each do |v| %>
+              <tr>
+                <td><%= v.year %></td>
+                <td><%= number_to_currency(v.value) %></td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="2" class="empty-state">Sin valuaciones cargadas.</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

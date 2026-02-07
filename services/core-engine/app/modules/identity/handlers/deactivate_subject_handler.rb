@@ -1,0 +1,25 @@
+# frozen_string_literal: true
+
+# Fisco.io - DeactivateSubjectHandler
+# Carga agregado, persiste SubjectDeactivated, publica.
+
+module Identity
+  module Handlers
+    class DeactivateSubjectHandler
+      def initialize(repository: nil, event_bus: nil)
+        @repository = repository || EventStore::Repository.new
+        @event_bus = event_bus || EventStore::EventBus.new
+      end
+
+      def call(cmd)
+        subject = @repository.load(cmd.aggregate_id, Identity::Subject)
+        raise ArgumentError, "Subject not found: #{cmd.aggregate_id}" unless subject
+
+        event = Identity::Events::SubjectDeactivated.new(aggregate_id: cmd.aggregate_id)
+        @repository.append(cmd.aggregate_id, Identity::Subject.name, event)
+        @event_bus.publish(event)
+        { subject_id: cmd.aggregate_id }
+      end
+    end
+  end
+end

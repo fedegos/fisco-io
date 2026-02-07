@@ -25,6 +25,28 @@ module Identity
         )
       end
 
+      def handle_SubjectUpdated(event)
+        return unless SubjectReadModel.table_exists?
+
+        rec = SubjectReadModel.find_by(subject_id: event.aggregate_id)
+        return unless rec
+
+        data = event.data
+        attrs = { updated_at: Time.current }
+        attrs[:legal_name] = data["legal_name"] if data.key?("legal_name")
+        attrs[:trade_name] = data["trade_name"] if data.key?("trade_name")
+        rec.update!(attrs)
+      end
+
+      def handle_SubjectDeactivated(event)
+        return unless SubjectReadModel.table_exists?
+
+        rec = SubjectReadModel.find_by(subject_id: event.aggregate_id)
+        return unless rec
+
+        rec.update!(status: "inactive", updated_at: Time.current)
+      end
+
       def handle_RepresentativeAuthorized(_event)
         # TODO: actualizar read model (representantes)
       end

@@ -1,39 +1,74 @@
-<% content_for :title, "Tramos alicuotas #{@year} - Operadores - Fisco.io" %>
+<% content_for :title, "Tramos alícuotas #{@year} - Operadores - Fisco.io" %>
 <div class="page-container">
   <header class="page-header">
-    <h1 class="page-title">Tramos de alicuotas - Ano <%= @year %></h1>
-    <p class="page-subtitle">Base desde-hasta, tasa % y monto minimo por tramo.</p>
+    <h1 class="page-title">Tramos de alícuotas — Año <%= @year %></h1>
+    <p class="page-subtitle">Edite los tramos en la tabla; agregue una fila nueva al final y guarde. Marque "Eliminar" para quitar un tramo.</p>
   </header>
-  <p>
-    <%= link_to "Volver a configuracion", operadores_inmobiliario_configs_path %> |
-    <%= link_to "Nuevo tramo", operadores_new_inmobiliario_bracket_path(@year) %>
+  <p class="page-actions">
+    <%= link_to "Volver a configuración", operadores_inmobiliario_configs_path, class: "btn btn--secondary" %>
   </p>
-  <div class="table-wrapper">
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Base desde</th>
-          <th scope="col">Base hasta</th>
-          <th scope="col">Alicuota %</th>
-          <th scope="col">Monto minimo</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% if @brackets.any? %>
-          <% @brackets.each do |b| %>
+  <%= form_with url: operadores_inmobiliario_brackets_path(@year), method: :patch, local: true, class: "brackets-form" do %>
+    <div class="table-wrapper">
+      <table class="table table--editable">
+        <thead>
+          <tr>
+            <th scope="col">Base desde</th>
+            <th scope="col">Base hasta</th>
+            <th scope="col">Alícuota %</th>
+            <th scope="col">Monto mínimo</th>
+            <th scope="col">Orden</th>
+            <th scope="col">Eliminar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @brackets.each_with_index do |b, idx| %>
             <tr>
-              <td><%= number_with_delimiter(b.base_from) %></td>
-              <td><%= number_with_delimiter(b.base_to) %></td>
-              <td><%= b.rate_pct %>%</td>
-              <td><%= number_to_currency(b.minimum_amount) %></td>
+              <td>
+                <%= number_field_tag "brackets[brackets_attributes][#{idx}][base_from]", b.base_from, min: 0, step: 0.01, class: "form-input form-input--number" %>
+                <%= hidden_field_tag "brackets[brackets_attributes][#{idx}][id]", b.id %>
+              </td>
+              <td>
+                <%= number_field_tag "brackets[brackets_attributes][#{idx}][base_to]", b.base_to, min: 0, step: 0.01, class: "form-input form-input--number" %>
+              </td>
+              <td>
+                <%= number_field_tag "brackets[brackets_attributes][#{idx}][rate_pct]", b.rate_pct, step: 0.0001, class: "form-input form-input--number" %>
+              </td>
+              <td>
+                <%= number_field_tag "brackets[brackets_attributes][#{idx}][minimum_amount]", b.minimum_amount, min: 0, step: 0.01, class: "form-input form-input--number" %>
+              </td>
+              <td>
+                <%= number_field_tag "brackets[brackets_attributes][#{idx}][position]", b.position, min: 0, class: "form-input form-input--number form-input--narrow" %>
+              </td>
+              <td>
+                <%= check_box_tag "brackets[brackets_attributes][#{idx}][_destroy]", "1", false, class: "form-input form-input--checkbox", "aria-label": "Eliminar tramo" %>
+              </td>
             </tr>
           <% end %>
-        <% else %>
-          <tr>
-            <td colspan="4" class="empty-state">No hay tramos. Agregue al menos uno.</td>
+          <% new_idx = @brackets.size %>
+          <tr class="brackets-form__new-row">
+            <td>
+              <%= number_field_tag "brackets[brackets_attributes][#{new_idx}][base_from]", nil, min: 0, step: 0.01, class: "form-input form-input--number", placeholder: "Nuevo" %>
+            </td>
+            <td>
+              <%= number_field_tag "brackets[brackets_attributes][#{new_idx}][base_to]", nil, min: 0, step: 0.01, class: "form-input form-input--number", placeholder: "—" %>
+            </td>
+            <td>
+              <%= number_field_tag "brackets[brackets_attributes][#{new_idx}][rate_pct]", nil, step: 0.0001, class: "form-input form-input--number", placeholder: "—" %>
+            </td>
+            <td>
+              <%= number_field_tag "brackets[brackets_attributes][#{new_idx}][minimum_amount]", nil, min: 0, step: 0.01, class: "form-input form-input--number", placeholder: "—" %>
+            </td>
+            <td>
+              <%= number_field_tag "brackets[brackets_attributes][#{new_idx}][position]", new_idx + 1, min: 0, class: "form-input form-input--number form-input--narrow" %>
+            </td>
+            <td></td>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+        </tbody>
+      </table>
+    </div>
+    <div class="form-actions">
+      <%= submit_tag "Guardar cambios", class: "btn btn--primary" %>
+      <%= link_to "Cancelar", operadores_inmobiliario_configs_path, class: "btn btn--secondary" %>
+    </div>
+  <% end %>
 </div>

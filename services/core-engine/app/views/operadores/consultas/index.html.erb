@@ -2,42 +2,42 @@
 
 <div class="page-container">
   <header class="page-header">
-    <h1 class="page-title">Consultas (read models)</h1>
+    <h1 class="page-title">Consultas (modelos de lectura)</h1>
     <p class="page-subtitle">Proyecciones disponibles: sujetos y saldos por obligación. Vista previa y enlaces a la API.</p>
   </header>
 
   <div class="card-grid">
     <section class="card">
-      <h2 style="margin: 0 0 var(--space-sm); font-size: 1.125rem;">Subjects</h2>
-      <p style="margin: 0 0 var(--space-md); color: var(--color-text-muted); font-size: 0.875rem;">
+      <h2 class="card__title card__title--sm">Sujetos</h2>
+      <p class="card__description">
         Proyección de sujetos (identidad). Total: <strong><%= @subjects_count %></strong>.
         API: <code>GET /api/subjects</code>
       </p>
       <% if @subjects_sample.any? %>
-        <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.875rem;">
+        <ul class="list-unstyled list-unstyled--bullets text-small">
           <% @subjects_sample.each do |s| %>
             <li><%= s.legal_name %> (<%= s.tax_id %>)</li>
           <% end %>
         </ul>
       <% else %>
-        <p class="empty-state" style="margin: 0;">Sin datos.</p>
+        <p class="empty-state">Sin datos.</p>
       <% end %>
     </section>
 
     <section class="card">
-      <h2 style="margin: 0 0 var(--space-sm); font-size: 1.125rem;">Tax account balances</h2>
-      <p style="margin: 0 0 var(--space-md); color: var(--color-text-muted); font-size: 0.875rem;">
+      <h2 class="card__title card__title--sm">Saldos por obligación</h2>
+      <p class="card__description">
         Proyección de saldos por obligación. Total: <strong><%= @obligations_count %></strong>.
         API: <code>GET /api/obligations</code>
       </p>
       <% if @obligations_sample.any? %>
-        <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.875rem;">
+        <ul class="list-unstyled list-unstyled--bullets text-small">
           <% @obligations_sample.each do |ob| %>
-            <li><span class="badge badge--muted"><%= ob.tax_type %></span> <%= number_to_currency(ob.current_balance) %></li>
+            <li><span class="badge badge--muted"><%= ob.tax_type %></span> <%= link_to ob.display_id, operadores_obligacion_path(ob.obligation_id) %> — <%= number_to_currency(ob.current_balance) %></li>
           <% end %>
         </ul>
       <% else %>
-        <p class="empty-state" style="margin: 0;">Sin datos.</p>
+        <p class="empty-state">Sin datos.</p>
       <% end %>
     </section>
   </div>

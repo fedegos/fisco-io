@@ -37,7 +37,8 @@ class SeedDemoDataService
           obligation_id: SecureRandom.uuid,
           primary_subject_id: subject_ids[idx],
           tax_type: o[:tax_type],
-          role: o[:role] || "contribuyente"
+          role: o[:role] || "contribuyente",
+          external_id: o[:external_id].to_s.presence
         )
       )[:obligation_id]
     end
@@ -77,9 +78,9 @@ class SeedDemoDataService
 
   def self.default_obligaciones
     [
-      { primary_subject_index: 0, tax_type: "inmobiliario", role: "contribuyente" },
-      { primary_subject_index: 0, tax_type: "inmobiliario", role: "contribuyente" },
-      { primary_subject_index: 1, tax_type: "inmobiliario", role: "contribuyente" }
+      { primary_subject_index: 0, tax_type: "inmobiliario", role: "contribuyente", external_id: "12-10001" },
+      { primary_subject_index: 0, tax_type: "inmobiliario", role: "contribuyente", external_id: "12-10002" },
+      { primary_subject_index: 1, tax_type: "inmobiliario", role: "contribuyente", external_id: "12-20001" }
     ]
   end
 

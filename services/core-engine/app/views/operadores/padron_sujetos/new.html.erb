@@ -1,0 +1,27 @@
+<% content_for :title, "Alta de sujeto - Operadores - Fisco.io" %>
+<div class="page-container">
+  <header class="page-header">
+    <p class="page-subtitle"><%= link_to "Padrón de sujetos", operadores_padron_sujetos_path %> → Alta</p>
+    <h1 class="page-title">Alta de sujeto</h1>
+  </header>
+  <div class="card">
+    <%= form_with model: @sujeto, url: operadores_padron_sujetos_path, method: :post, local: true do |f| %>
+      <div class="form-field">
+        <%= f.label :tax_id, "CUIT / N.º fiscal" %>
+        <%= f.text_field :tax_id, class: "form-input", required: true %>
+      </div>
+      <div class="form-field">
+        <%= f.label :legal_name, "Razón social" %>
+        <%= f.text_field :legal_name, class: "form-input", required: true %>
+      </div>
+      <div class="form-field">
+        <%= f.label :trade_name, "Nombre de fantasía" %>
+        <%= f.text_field :trade_name, class: "form-input" %>
+      </div>
+      <div class="form-actions">
+        <%= f.submit "Crear sujeto", class: "btn btn--primary" %>
+        <%= link_to "Cancelar", operadores_padron_sujetos_path, class: "btn btn--secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -6,13 +6,41 @@
     <p class="page-subtitle">Administración tributaria y configuración.</p>
   </header>
 
-  <div class="card">
-    <p>Desde aquí podrá configurar impuestos, gestionar el padrón de objetos y verificar montos y estado de deudas.</p>
-    <ul style="margin: var(--space-md) 0 0; padding-left: 1.25rem;">
-      <li><%= link_to "Eventos (event store)", operadores_eventos_path %></li>
-      <li><%= link_to "Comandos", operadores_comandos_path %></li>
-      <li><%= link_to "Consultas (read models)", operadores_consultas_path %></li>
-      <li><%= link_to "Configuración inmobiliario", operadores_inmobiliario_configs_path %></li>
-    </ul>
+  <p class="page-intro">Desde aquí podrá configurar impuestos, gestionar el padrón de objetos y sujetos, y verificar montos y estado de deudas.</p>
+
+  <div class="card-grid card-grid--dashboard">
+    <section class="card" aria-labelledby="section-event-store">
+      <h2 id="section-event-store" class="card__title">Almacén de eventos y auditoría</h2>
+      <p class="card__description">Eventos y comandos del motor de eventos.</p>
+      <ul class="list-unstyled">
+        <li class="list-item"><%= link_to "Eventos (almacén de eventos)", operadores_eventos_path, class: "app-nav__link" %></li>
+        <li><%= link_to "Comandos", operadores_comandos_path, class: "app-nav__link" %></li>
+      </ul>
+    </section>
+
+    <section class="card" aria-labelledby="section-config">
+      <h2 id="section-config" class="card__title">Configuración tributaria</h2>
+      <p class="card__description">Tipos de impuesto, períodos y alícuotas.</p>
+      <ul class="list-unstyled">
+        <li><%= link_to "Configuración inmobiliario", operadores_inmobiliario_configs_path, class: "app-nav__link" %></li>
+      </ul>
+    </section>
+
+    <section class="card" aria-labelledby="section-padrones">
+      <h2 id="section-padrones" class="card__title">Padrones</h2>
+      <p class="card__description">Padrón de sujetos y padrón de objetos (obligaciones). Exportar e importar JSON.</p>
+      <ul class="list-unstyled">
+        <li class="list-item"><%= link_to "Padrón de sujetos", operadores_padron_sujetos_path, class: "app-nav__link" %></li>
+        <li><%= link_to "Padrón de objetos", operadores_padron_objetos_path, class: "app-nav__link" %></li>
+      </ul>
+    </section>
+
+    <section class="card" aria-labelledby="section-consultas">
+      <h2 id="section-consultas" class="card__title">Consultas</h2>
+      <p class="card__description">Modelos de lectura: sujetos, obligaciones, cuenta corriente.</p>
+      <ul class="list-unstyled">
+        <li><%= link_to "Consultas (modelos de lectura)", operadores_consultas_path, class: "app-nav__link" %></li>
+      </ul>
+    </section>
   </div>
 </div>

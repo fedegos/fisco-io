@@ -1,0 +1,41 @@
+<% content_for :title, "Precálculo año #{@year} - Operadores - Fisco.io" %>
+<div class="page-container">
+  <header class="page-header">
+    <p class="page-subtitle"><%= link_to "Precálculo", operadores_precalculos_path %> - Año <%= @year %></p>
+    <h1 class="page-title">Precálculo año <%= @year %></h1>
+  </header>
+  <p class="page-actions">
+    <%= button_to "Validar resultados", operadores_validar_precalculo_path(@year), method: :patch, class: "btn btn--secondary" %>
+    <%= button_to "Revertir precálculo", operadores_revertir_precalculo_path(@year), method: :delete, form: { data: { confirm: "¿Eliminar todo el precálculo de este año?" } }, class: "btn btn--secondary" %>
+    <%= button_to "Pasar a producción", operadores_producir_precalculo_path(@year), method: :patch, form: { data: { confirm: "¿Crear liquidaciones definitivas para todos los registros del precálculo?" } }, class: "btn btn--primary" %>
+  </p>
+  <div class="table-wrapper">
+    <table class="table" role="grid" aria-label="Precálculo por obligación">
+      <thead>
+        <tr>
+          <th scope="col">Obligación</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Cuotas</th>
+          <th scope="col">Total anual</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @previews.any? %>
+          <% @previews.each do |p| %>
+            <% bal = TaxAccountBalance.find_by(obligation_id: p.obligation_id) %>
+            <tr>
+              <td><%= bal ? bal.display_id : p.obligation_id %></td>
+              <td><span class="badge badge--muted"><%= p.status %></span></td>
+              <td><%= p.installments_count %></td>
+              <td><%= number_to_currency(p.annual_total) %></td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="4" class="empty-state">Sin registros de precálculo para este año.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

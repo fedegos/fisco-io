@@ -8,7 +8,8 @@ module EventStore
   class EventBus
     DEFAULT_PROJECTORS = [
       Identity::Projections::SubjectProjection.new,
-      Obligations::Projections::TaxAccountBalanceProjection.new
+      Obligations::Projections::TaxAccountBalanceProjection.new,
+      Obligations::Projections::AccountMovementsProjection.new
     ].freeze
 
     def initialize(projectors: nil)

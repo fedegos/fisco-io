@@ -11,11 +11,11 @@ CASOS_SUJETOS = [
   { tax_id: "27-98765432-1", legal_name: "Juan Pérez", trade_name: nil }
 ].freeze
 
-# Cada obligación: :primary_subject_index (índice en CASOS_SUJETOS), :tax_type, opcional :role
+# Cada obligación: :primary_subject_index, :tax_type, opcional :role, :external_id (partido-partida para inmobiliario)
 CASOS_OBLIGACIONES = [
-  { primary_subject_index: 0, tax_type: "inmobiliario", role: "contribuyente" },
-  { primary_subject_index: 0, tax_type: "inmobiliario", role: "contribuyente" },
-  { primary_subject_index: 1, tax_type: "inmobiliario", role: "contribuyente" }
+  { primary_subject_index: 0, tax_type: "inmobiliario", role: "contribuyente", external_id: "12-10001" },
+  { primary_subject_index: 0, tax_type: "inmobiliario", role: "contribuyente", external_id: "12-10002" },
+  { primary_subject_index: 1, tax_type: "inmobiliario", role: "contribuyente", external_id: "12-20001" }
 ].freeze
 
 # Cada liquidación: :obligation_index, :period, :amount

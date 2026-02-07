@@ -9,12 +9,12 @@
   <div class="card-grid" role="list">
     <% @comandos.each do |cmd| %>
       <article class="card card--event" role="listitem">
-        <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center; margin-bottom: var(--space-sm);">
+        <div class="meta-row">
           <span class="badge"><%= cmd[:name] %></span>
           <span class="badge badge--muted"><%= cmd[:aggregate] %></span>
         </div>
-        <p style="margin: 0; font-size: 0.875rem; color: var(--color-text-muted);">
-          Parámetros: <code style="font-size: 0.8rem;"><%= cmd[:params].join(", ") %></code>
+        <p class="text-small text-muted">
+          Parámetros: <code class="code--xs"><%= cmd[:params].join(", ") %></code>
         </p>
       </article>
     <% end %>

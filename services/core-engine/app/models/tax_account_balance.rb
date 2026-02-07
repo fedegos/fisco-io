@@ -7,7 +7,11 @@ class TaxAccountBalance < ActiveRecord::Base
   self.table_name = "tax_account_balances"
   self.primary_key = "obligation_id"
 
-  # obligation_id (uuid PK), subject_id, tax_type, current_balance, principal_balance,
-  # interest_balance, last_payment_date, last_liquidation_date, version, created_at, updated_at
+  # obligation_id (uuid PK), subject_id, tax_type, external_id (mostrable), current_balance, ...
   validates :obligation_id, :subject_id, :tax_type, presence: true
+
+  # Identificador a mostrar a sujetos externos (no UUID)
+  def display_id
+    external_id.presence || obligation_id
+  end
 end

@@ -1,0 +1,79 @@
+<% content_for :title, "Padrón de objetos - Operadores - Fisco.io" %>
+
+<div class="page-container">
+  <header class="page-header">
+    <p class="page-subtitle"><%= link_to "Operadores", operadores_root_path %> → Padrones</p>
+    <h1 class="page-title">Padrón de objetos (obligaciones)</h1>
+    <p class="page-subtitle">Listado, exportación e importación idempotente por UUID (ID de obligación).</p>
+  </header>
+
+  <p class="page-actions">
+    <%= link_to "Alta de obligación", operadores_new_padron_objeto_path, class: "btn btn--primary" %>
+  </p>
+
+  <div class="filters-bar">
+    <%= form_with url: operadores_padron_objetos_path, method: :get, local: true do |f| %>
+      <%= f.text_field :q, value: params[:q], placeholder: "Buscar por identificador externo o UUID" %>
+      <%= f.select :tax_type, options_for_select([["Todos", ""], ["inmobiliario", "inmobiliario"], ["ingresos_brutos", "ingresos_brutos"]], params[:tax_type]) %>
+      <%= f.submit "Filtrar" %>
+    <% end %>
+  </div>
+
+  <div class="card card--spaced">
+    <h2 class="card__title">Exportar / Importar</h2>
+    <p class="card__description">Exportar: archivo JSON con ID de obligación (UUID) y atributos. Importar: idempotente por ID de obligación (existe → omitir; no existe → crear). Se valida el identificador externo según el tipo de impuesto si aplica.</p>
+    <p class="card__description">
+      <%= link_to "Descargar JSON", operadores_padron_objetos_export_path(q: params[:q], tax_type: params[:tax_type]), class: "app-nav__link" %>
+    </p>
+    <%= form_with url: operadores_padron_objetos_import_path, method: :post, local: true, multipart: true do |f| %>
+      <%= f.file_field :file, accept: "application/json" %>
+      <%= f.submit "Importar JSON" %>
+    <% end %>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="table" role="grid" aria-label="Padrón de objetos">
+      <thead>
+        <tr>
+          <th scope="col">Identificador</th>
+          <th scope="col">Tipo</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Saldo actual</th>
+          <th scope="col">Última liquidación</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @obligaciones.any? %>
+          <% @obligaciones.each do |ob| %>
+            <tr>
+              <td><%= ob.display_id %></td>
+              <td><span class="badge badge--muted"><%= ob.tax_type %></span></td>
+              <td>
+                <% if ob.respond_to?(:status) && ob.status.present? %>
+                  <span class="badge <%= ob.status == 'closed' ? 'badge--muted' : 'badge--success' %>"><%= ob.status == "closed" ? "Cerrada" : "Abierta" %></span>
+                <% else %>
+                  —
+                <% end %>
+              </td>
+              <td><%= number_to_currency(ob.current_balance) %></td>
+              <td><%= ob.last_liquidation_date&.to_s %></td>
+              <td>
+                <%= link_to "Ver", operadores_padron_objeto_path(ob.obligation_id), class: "app-nav__link" %>
+                | <%= link_to "Editar", operadores_edit_padron_objeto_path(ob.obligation_id), class: "app-nav__link" %>
+                | <%= link_to "Cuenta corriente", operadores_obligacion_path(ob.obligation_id), class: "app-nav__link" %>
+                <% if !ob.respond_to?(:status) || ob.status != "closed" %>
+                  | <%= button_to "Cerrar", operadores_cerrar_padron_objeto_path(ob.obligation_id), method: :patch, form: { data: { confirm: "¿Cerrar esta obligación?" } }, class: "btn btn--secondary btn--sm-inline" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="6" class="empty-state">Sin obligaciones.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

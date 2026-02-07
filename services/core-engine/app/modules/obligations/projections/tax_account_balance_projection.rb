@@ -13,15 +13,44 @@ module Obligations
         record = TaxAccountBalance.find_or_initialize_by(obligation_id: data["obligation_id"])
         return if record.persisted? # idempotencia
 
-        record.assign_attributes(
+        attrs = {
           subject_id: data["primary_subject_id"],
           tax_type: data["tax_type"],
+          external_id: data["external_id"].presence,
           current_balance: 0,
           principal_balance: 0,
           interest_balance: 0,
           version: 1
-        )
+        }
+        attrs[:status] = "open" if record.respond_to?(:status=)
+        record.assign_attributes(attrs)
         record.save!
+      end
+
+      def handle_TaxObligationUpdated(event)
+        return unless TaxAccountBalance.table_exists?
+
+        record = TaxAccountBalance.find_by(obligation_id: event.aggregate_id)
+        return unless record
+
+        data = event.data
+        attrs = {}
+        attrs[:external_id] = data["external_id"] if data.key?("external_id")
+        record.update!(attrs) if attrs.any?
+      end
+
+      def handle_TaxObligationClosed(event)
+        return unless TaxAccountBalance.table_exists?
+
+        record = TaxAccountBalance.find_by(obligation_id: event.aggregate_id)
+        return unless record
+
+        data = event.data
+        closed_at = data["closed_at"].is_a?(String) ? Date.parse(data["closed_at"]) : data["closed_at"]
+        attrs = {}
+        attrs[:status] = "closed" if record.respond_to?(:status=)
+        attrs[:closed_at] = closed_at if record.respond_to?(:closed_at=)
+        record.update!(attrs) if attrs.any?
       end
 
       def handle_TaxLiquidationCreated(event)

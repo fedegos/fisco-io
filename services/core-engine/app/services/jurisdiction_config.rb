@@ -27,4 +27,26 @@ class JurisdictionConfig
   def tax_type_config(tax_type)
     data.dig("tax_types", tax_type.to_s)
   end
+
+  # Configuración del identificador externo mostrable por tipo de impuesto
+  # external_id: { label:, regex:, description: }
+  def external_id_config(tax_type)
+    tax_type_config(tax_type)&.dig("external_id")
+  end
+
+  # Valida external_id contra el regex del tax_type (si está configurado).
+  # jurisdiction_code: ej. "arba". Devuelve [ok, error_message].
+  def self.validate_external_id(tax_type:, external_id:, jurisdiction_code: "arba")
+    return [true, nil] if external_id.blank?
+    config = JurisdictionConfig.for(jurisdiction_code)
+    cfg = config&.external_id_config(tax_type)
+    return [true, nil] unless cfg && cfg["regex"].present?
+    regex = Regexp.new(cfg["regex"])
+    if regex.match?(external_id.to_s.strip)
+      [true, nil]
+    else
+      label = cfg["label"] || "Identificador"
+      [false, "#{label} no cumple el formato esperado"]
+    end
+  end
 end

@@ -1,10 +1,10 @@
-<% content_for :title, "Editar config - Operadores" %>
+<% content_for :title, "Editar configuración - Operadores" %>
 <div class="page-container">
-  <h1 class="page-title">Editar <%= @config.year %></h1>
+  <h1 class="page-title">Editar año <%= @config.year %></h1>
   <div class="card">
     <%= form_with model: @config, url: operadores_inmobiliario_config_path(@config.id), method: :patch do |f| %>
-      <%= f.label :formula_base_expression %> <%= f.text_field :formula_base_expression %>
-      <%= f.label :installments_per_year %> <%= f.number_field :installments_per_year, min: 1, max: 12 %>
+      <%= f.label :formula_base_expression, "Expresión fórmula base" %> <%= f.text_field :formula_base_expression %>
+      <%= f.label :installments_per_year, "Cuotas por año" %> <%= f.number_field :installments_per_year, min: 1, max: 12 %>
       <%= f.submit "Actualizar" %>
     <% end %>
   </div>

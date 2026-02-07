@@ -1,0 +1,59 @@
+<% content_for :title, "Obligación #{@obligacion.display_id} - Operadores - Fisco.io" %>
+
+<div class="page-container">
+  <header class="page-header">
+    <p class="page-subtitle"><%= link_to "Consultas", operadores_consultas_path %> → Detalle obligación</p>
+    <h1 class="page-title">Obligación <%= @obligacion.display_id %></h1>
+    <p class="page-subtitle"><span class="badge badge--muted"><%= @obligacion.tax_type %></span> <span class="id-internal">ID interno: <%= @obligacion.obligation_id %></span></p>
+  </header>
+
+  <section class="card card--spaced">
+    <h2 class="card__title card__title--sm">Saldo actual</h2>
+    <p class="balance-amount"><%= number_to_currency(@obligacion.current_balance) %></p>
+  </section>
+
+  <% if @sujetos_responsables.any? %>
+    <section class="card card--spaced">
+      <h2 class="card__title">Sujetos responsables</h2>
+      <ul class="list-unstyled list-unstyled--bullets">
+        <% @sujetos_responsables.each do |s| %>
+          <li><strong><%= s[:legal_name] %></strong> (<%= s[:tax_id] %>) — <span class="badge badge--muted"><%= s[:role] %></span></li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+
+  <section class="card">
+    <h2 class="card__title">Cuenta corriente (movimientos)</h2>
+    <div class="table-wrapper">
+      <table class="table" role="grid" aria-label="Movimientos de la obligación">
+        <thead>
+          <tr>
+            <th scope="col">Fecha</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Débito / Crédito</th>
+            <th scope="col">Período</th>
+            <th scope="col">Monto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if @movimientos.any? %>
+            <% @movimientos.each do |mov| %>
+              <tr>
+                <td><%= mov.movement_date&.to_s %></td>
+                <td><%= mov.movement_type_label %></td>
+                <td><span class="badge <%= mov.debit_credit == 'debit' ? 'badge--muted' : 'badge--success' %>"><%= mov.debit_credit == 'debit' ? 'Débito' : 'Crédito' %></span></td>
+                <td><%= mov.period %></td>
+                <td><%= number_to_currency(mov.amount) %></td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="5" class="empty-state">Sin movimientos.</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

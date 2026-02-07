@@ -1,19 +1,22 @@
 <% content_for :title, "Configuración inmobiliario - Operadores - Fisco.io" %>
 <div class="page-container">
   <header class="page-header">
-    <h1 class="page-title">Configuracion inmobiliario</h1>
+    <h1 class="page-title">Configuración inmobiliario</h1>
     <p class="page-subtitle">Determinación por año: fórmula de base imponible y cuotas.</p>
   </header>
-  <p><%= link_to "Nueva configuración (año)", operadores_configuracion_inmobiliario_new_path, class: "app-nav__link" %></p>
+  <p class="page-actions">
+    <%= link_to "Nueva configuración (año)", operadores_configuracion_inmobiliario_new_path, class: "btn btn--secondary" %>
+    <%= link_to "Precálculo por año", operadores_precalculos_path, class: "btn btn--primary" %>
+  </p>
   <div class="card-grid">
     <% if @configs.any? %>
       <% @configs.each do |c| %>
         <article class="card card--event">
           <span class="badge"><%= c.year %></span>
-          <p style="margin: var(--space-sm) 0 0;"><strong>Fórmula base:</strong> <code><%= c.formula_base_expression %></code></p>
-          <p style="margin: var(--space-xs) 0 0;">Cuotas por año: <%= c.installments_per_year %></p>
-          <p style="margin: var(--space-md) 0 0;">
-            <%= link_to "Editar", edit_operadores_inmobiliario_config_path(c.id) %> |
+          <p class="card__actions--sm"><strong>Fórmula base:</strong> <code><%= c.formula_base_expression %></code></p>
+          <p class="card__actions--xs">Cuotas por año: <%= c.installments_per_year %></p>
+          <p class="card__actions">
+            <%= link_to "Editar", operadores_edit_inmobiliario_config_path(c.id) %> |
             <%= link_to "Tramos alícuotas", operadores_inmobiliario_brackets_path(c.year) %>
           </p>
         </article>

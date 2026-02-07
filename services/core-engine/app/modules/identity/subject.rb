@@ -37,6 +37,16 @@ module Identity
       @registration_date = data["registration_date"]
     end
 
+    def apply_SubjectUpdated(event)
+      data = event.data
+      @legal_name = data["legal_name"] if data.key?("legal_name")
+      @trade_name = data["trade_name"] if data.key?("trade_name")
+    end
+
+    def apply_SubjectDeactivated(_event)
+      @status = "inactive"
+    end
+
     def apply_SubjectSegmentChanged(event)
       @legal_segments = event.data["legal_segments"] if event.data.key?("legal_segments")
       @administrative_segments = event.data["administrative_segments"] if event.data.key?("administrative_segments")

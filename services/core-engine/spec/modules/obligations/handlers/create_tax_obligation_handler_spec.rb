@@ -49,5 +49,36 @@ RSpec.describe Obligations::Handlers::CreateTaxObligationHandler do
       loaded = repository.load(obligation_id, Obligations::TaxObligation)
       expect(loaded.obligation_id).to eq(obligation_id)
     end
+
+    it "incluye external_id en el evento cuando se provee y es válido" do
+      obligation_id = SecureRandom.uuid
+      subject_id = SecureRandom.uuid
+      cmd = Obligations::Commands::CreateTaxObligation.new(
+        obligation_id: obligation_id,
+        primary_subject_id: subject_id,
+        tax_type: "inmobiliario",
+        role: "taxpayer",
+        external_id: "12-34567"
+      )
+
+      result = handler.call(cmd)
+      expect(result[:obligation_id]).to eq(obligation_id)
+
+      record = EventRecord.where(aggregate_id: obligation_id).order(:event_version).last
+      expect(record.event_type).to eq("TaxObligationCreated")
+      expect(record.data["external_id"]).to eq("12-34567")
+    end
+
+    it "lanza ArgumentError si external_id no cumple el regex del tax_type" do
+      cmd = Obligations::Commands::CreateTaxObligation.new(
+        obligation_id: SecureRandom.uuid,
+        primary_subject_id: SecureRandom.uuid,
+        tax_type: "inmobiliario",
+        role: "taxpayer",
+        external_id: "invalid"
+      )
+
+      expect { handler.call(cmd) }.to raise_error(ArgumentError, /Partido-Partida/)
+    end
   end
 end

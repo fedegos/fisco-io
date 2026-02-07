@@ -1,0 +1,70 @@
+<% content_for :title, "Padrón de sujetos - Operadores - Fisco.io" %>
+
+<div class="page-container">
+  <header class="page-header">
+    <p class="page-subtitle"><%= link_to "Operadores", operadores_root_path %> → Padrones</p>
+    <h1 class="page-title">Padrón de sujetos</h1>
+    <p class="page-subtitle">Listado, exportación e importación idempotente por UUID (ID de sujeto).</p>
+  </header>
+
+  <p class="page-actions">
+    <%= link_to "Alta de sujeto", operadores_new_padron_sujeto_path, class: "btn btn--primary" %>
+  </p>
+
+  <div class="filters-bar">
+    <%= form_with url: operadores_padron_sujetos_path, method: :get, local: true do |f| %>
+      <%= f.text_field :q, value: params[:q], placeholder: "Buscar por nombre o CUIT / número fiscal" %>
+      <%= f.submit "Filtrar" %>
+    <% end %>
+  </div>
+
+  <div class="card card--spaced">
+    <h2 class="card__title">Exportar / Importar</h2>
+    <p class="card__description">Exportar: archivo JSON con ID de sujeto (UUID) y atributos. Importar: idempotente por ID de sujeto (existe → omitir; no existe → crear).</p>
+    <p class="card__description">
+      <%= link_to "Descargar JSON", operadores_padron_sujetos_export_path(q: params[:q]), class: "app-nav__link" %>
+    </p>
+    <%= form_with url: operadores_padron_sujetos_import_path, method: :post, local: true, multipart: true do |f| %>
+      <%= f.file_field :file, accept: "application/json" %>
+      <%= f.submit "Importar JSON" %>
+    <% end %>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="table" role="grid" aria-label="Padrón de sujetos">
+      <thead>
+        <tr>
+          <th scope="col">ID sujeto (UUID)</th>
+          <th scope="col">CUIT / N.º fiscal</th>
+          <th scope="col">Razón social</th>
+          <th scope="col">Nombre de fantasía</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @sujetos.any? %>
+          <% @sujetos.each do |s| %>
+            <tr>
+              <td><code class="code--small"><%= s.subject_id %></code></td>
+              <td><%= s.tax_id %></td>
+              <td><%= s.legal_name %></td>
+              <td><%= s.trade_name %></td>
+              <td><span class="badge badge--muted"><%= s.status == "active" ? "Activo" : (s.status == "inactive" ? "Inactivo" : s.status) %></span></td>
+              <td>
+                <%= link_to "Editar", operadores_edit_padron_sujeto_path(s.subject_id), class: "app-nav__link" %>
+                <% if s.status == "active" %>
+                  | <%= button_to "Desactivar", operadores_desactivar_padron_sujeto_path(s.subject_id), method: :patch, form: { data: { confirm: "¿Desactivar este sujeto?" } }, class: "btn btn--secondary btn--sm-inline" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="6" class="empty-state">Sin sujetos.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -8,19 +8,19 @@
   <div class="card">
     <%= form_with model: @bracket, url: operadores_inmobiliario_brackets_path(@year), method: :post, local: true do |f| %>
       <%= f.hidden_field :position, value: @bracket.position %>
-      <div style="margin-bottom: var(--space-md);">
+      <div class="form-field">
         <%= f.label :base_from, "Base desde" %>
         <%= f.number_field :base_from, min: 0, step: 0.01 %>
       </div>
-      <div style="margin-bottom: var(--space-md);">
+      <div class="form-field">
         <%= f.label :base_to, "Base hasta" %>
         <%= f.number_field :base_to, min: 0, step: 0.01 %>
       </div>
-      <div style="margin-bottom: var(--space-md);">
+      <div class="form-field">
         <%= f.label :rate_pct, "Alícuota %" %>
         <%= f.number_field :rate_pct, step: 0.0001 %>
       </div>
-      <div style="margin-bottom: var(--space-md);">
+      <div class="form-field">
         <%= f.label :minimum_amount, "Monto mínimo" %>
         <%= f.number_field :minimum_amount, min: 0, step: 0.01 %>
       </div>

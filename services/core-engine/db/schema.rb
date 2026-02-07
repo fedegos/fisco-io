@@ -10,9 +10,34 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 6) do
+ActiveRecord::Schema[8.1].define(version: 10) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "account_movements", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.decimal "amount", precision: 15, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.string "debit_credit", null: false
+    t.date "movement_date", null: false
+    t.string "movement_type", null: false
+    t.uuid "obligation_id", null: false
+    t.string "period"
+    t.string "reference"
+    t.datetime "updated_at", null: false
+    t.index ["obligation_id", "movement_date"], name: "idx_account_movements_obligation_date"
+    t.index ["obligation_id"], name: "idx_account_movements_obligation_id"
+  end
+
+  create_table "determination_previews", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.uuid "obligation_id", null: false
+    t.jsonb "payload", default: [], null: false
+    t.string "status", default: "draft", null: false
+    t.datetime "updated_at", null: false
+    t.integer "year", null: false
+    t.index ["year", "obligation_id"], name: "index_determination_previews_on_year_and_obligation_id", unique: true
+    t.index ["year"], name: "index_determination_previews_on_year"
+  end
 
   create_table "events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "aggregate_id", null: false
@@ -84,17 +109,21 @@ ActiveRecord::Schema[8.1].define(version: 6) do
   end
 
   create_table "tax_account_balances", primary_key: "obligation_id", id: :uuid, default: nil, force: :cascade do |t|
+    t.date "closed_at"
     t.datetime "created_at", null: false
     t.decimal "current_balance", precision: 15, scale: 2, default: "0.0", null: false
+    t.string "external_id"
     t.decimal "interest_balance", precision: 15, scale: 2, default: "0.0", null: false
     t.date "last_liquidation_date"
     t.date "last_payment_date"
     t.decimal "principal_balance", precision: 15, scale: 2, default: "0.0", null: false
+    t.string "status", default: "open", null: false
     t.uuid "subject_id", null: false
     t.string "tax_type", null: false
     t.datetime "updated_at", null: false
     t.integer "version", default: 0, null: false
     t.index ["subject_id"], name: "idx_tax_account_balances_subject_id"
+    t.index ["tax_type", "external_id"], name: "idx_tax_account_balances_tax_type_external_id", unique: true, where: "((external_id IS NOT NULL) AND ((external_id)::text <> ''::text))"
     t.index ["tax_type"], name: "idx_tax_account_balances_tax_type"
   end
 end

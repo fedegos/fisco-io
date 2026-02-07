@@ -24,13 +24,30 @@
 
     <main class="app-main" id="main-content">
       <% if flash[:notice].present? %>
-        <div class="flash flash--notice" role="status"><%= flash[:notice] %></div>
+        <div class="flash flash--notice flash--auto-dismiss" role="status" data-flash><%= flash[:notice] %></div>
       <% end %>
       <% if flash[:alert].present? %>
-        <div class="flash flash--alert" role="alert"><%= flash[:alert] %></div>
+        <div class="flash flash--alert flash--auto-dismiss" role="alert" data-flash><%= flash[:alert] %></div>
+      <% end %>
+      <% if flash[:info].present? %>
+        <div class="flash flash--info flash--auto-dismiss" role="status" data-flash><%= flash[:info] %></div>
       <% end %>
       <%= yield %>
     </main>
   </div>
+  <script>
+    (function() {
+      var flashes = document.querySelectorAll('[data-flash]');
+      flashes.forEach(function(el) {
+        var t = setTimeout(function() { el.style.display = 'none'; }, 5000);
+        el.addEventListener('click', function() { clearTimeout(t); el.style.display = 'none'; });
+      });
+      document.querySelectorAll('form[data-confirm]').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+          if (!confirm(form.getAttribute('data-confirm'))) e.preventDefault();
+        });
+      });
+    })();
+  </script>
 </body>
 </html>

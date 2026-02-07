@@ -79,7 +79,12 @@ You are an expert software architect specializing in event-driven systems, domai
 ### Frontend y UX (Rails + HTMX)
 - **Responsive desde el primer momento**: diseño mobile-first; usar variables CSS (espaciado, colores, breakpoints) y media queries para tablet/desktop.
 - **Layout único**: barra de navegación consistente (Contribuyente / Operadores), contenedor de contenido con ancho máximo, flashes visibles.
-- **Estilos**: hoja global en `public/stylesheets/application.css`; clases semánticas (BEM-light: `.app-nav`, `.page-container`, `.card`). Evitar estilos inline; preferir variables CSS (`:root`) para tema.
+- **Estilos**: hoja global en `public/stylesheets/application.css`; clases semánticas (BEM-light: `.app-nav`, `.page-container`, `.card`). Preferir variables CSS (`:root`) para tema.
+- **CSS modular y mantenible (obligatorio)**:
+  - **No usar estilos en línea** (`style="..."` ni `style:` en helpers). Todo el estilo debe vivir en hojas CSS.
+  - Usar un **sistema de clases reutilizables** en `public/stylesheets/application.css`: componentes (`.card`, `.card__title`, `.card__description`), utilidades (`.text-muted`, `.list-unstyled`, `.form-field`), modificadores (`.card--spaced`, `.card-grid--dashboard`).
+  - Nomenclatura BEM-light: bloque__elemento, bloque--modificador. Añadir nuevas clases al CSS cuando haga falta; no improvisar con estilos inline.
+  - Objetivo: un solo lugar para mantener estilos, fácil refactor y consistencia visual.
 - **Listas y datos**: preferir **tarjetas (cards) responsive con badges** en lugar de tablas; **edición en línea** e **formularios modales** para crear/editar en vez de páginas dedicadas. Si se usan tablas, envolver en `.table-wrapper` con `overflow-x: auto`; `<th scope="col">` y estado vacío claro.
 - **Paginación**: preferir **scroll infinito** a paginado (HTMX `hx-trigger="revealed"` o similar, con indicador de carga al final).
 - **Filtros y búsqueda**: las vistas de listas deben tener **filtros razonables para el dominio** (ej. por tipo de impuesto, estado, período) y **búsqueda libre** (texto); todo con **carga interactiva** (HTMX, sin recarga completa).
@@ -90,6 +95,17 @@ You are an expert software architect specializing in event-driven systems, domai
 ### Operadores vs Agentes (terminología)
 - **Operadores**: en este proyecto se refiere al **personal interno del fisco** (staff) que configura impuestos, gestiona padrón, verifica montos y consulta deudas. Rutas y portal bajo `/operadores` y namespace `Operadores`.
 - **Agentes** (en el dominio): son **sujetos obligados externos** (agentes de recaudación, agentes de información). No confundir con operadores; en código y UI usar "operador" para el portal interno y "agente" solo para el rol tributario (collection_agent, etc.).
+
+### Navegación en portales internos (operadores)
+- **No usar listas de bullets** como único menú de accesos en el dashboard operadores.
+- **Preferir agrupación por función**: event store y auditoría, configuración tributaria, padrones, consultas. Cada sección agrupa enlaces relacionados.
+- **Usar cards, grid de acciones o sidebar** para exponer las funciones; cada elemento con etiqueta clara y opcionalmente descripción breve.
+- **Mantener máximo dos niveles** de navegación desde el dashboard para no profundizar en exceso.
+
+### Identidad mostrable ante sujetos externos (no UUIDs)
+- Las **identidades globales internas** (UUID, obligation_id, subject_id) **no son para mostrar a sujetos externos** (contribuyentes, agentes). Los sujetos identifican sus obligaciones por identificadores que conocen (CUIT, partido-partida, patente, etc.).
+- En la **UI y en respuestas API** orientadas a contribuyentes o agentes: usar siempre el **identificador externo mostrable** (external_id configurado por tipo de impuesto: partido-partida, patente, CUIT, etc.) como identificador principal. No exponer obligation_id (UUID) ni otros IDs internos como identificador principal.
+- En contextos **operador o debug** se puede mostrar el UUID de forma secundaria si se considera necesario.
 
 ### Naming Conventions
 

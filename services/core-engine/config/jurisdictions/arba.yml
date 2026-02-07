@@ -10,6 +10,10 @@ jurisdiction:
 # Tax types configured for this jurisdiction
 tax_types:
   inmobiliario:
+    external_id:
+      label: Partido-Partida
+      regex: '^\d{1,3}-\d+$'
+      description: Partido (1-135) y partida numérica, ej. 12-34567
     nature: asset_based
     determination: pre_determined
     ownership: single
@@ -23,6 +27,10 @@ tax_types:
         comercial: 0.012
 
   ingresos_brutos:
+    external_id:
+      label: CUIT
+      regex: '^\d{2}-\d{8}-\d$'
+      description: CUIT 20-12345678-9
     nature: income_based
     determination: self_determined
     ownership: single

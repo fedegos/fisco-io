@@ -19,7 +19,7 @@
         <% if @obligaciones.any? %>
           <% @obligaciones.each do |ob| %>
             <tr>
-              <td><%= ob.obligation_id %></td>
+              <td><%= link_to ob.display_id, contribuyente_obligacion_path(ob.obligation_id) %></td>
               <td><%= ob.tax_type %></td>
               <td><%= number_to_currency(ob.current_balance) %></td>
             </tr>

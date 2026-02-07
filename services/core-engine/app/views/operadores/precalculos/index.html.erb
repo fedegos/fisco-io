@@ -1,0 +1,31 @@
+<% content_for :title, "Precálculo inmobiliario - Operadores - Fisco.io" %>
+<div class="page-container">
+  <header class="page-header">
+    <p class="page-subtitle"><%= link_to "Configuración inmobiliario", operadores_inmobiliario_configs_path %> - Precálculo</p>
+    <h1 class="page-title">Precálculo inmobiliario por año</h1>
+  </header>
+  <div class="card card--spaced">
+    <h2 class="card__title">Generar precálculo</h2>
+    <%= form_with url: operadores_generar_precalculo_path, method: :post, local: true do |f| %>
+      <div class="valuacion-form-row form-field">
+        <div class="form-field">
+          <label for="year" class="form-field__label">Año</label>
+          <input type="number" name="year" id="year" min="2001" max="2100" value="<%= Date.current.year %>" class="form-input form-input--narrow" required />
+        </div>
+        <%= f.submit "Generar precálculo", class: "btn btn--primary" %>
+      </div>
+    <% end %>
+  </div>
+  <% if @years_with_preview.any? %>
+    <div class="card">
+      <h2 class="card__title">Años con precálculo</h2>
+      <ul class="list-unstyled list-unstyled--bullets">
+        <% @years_with_preview.each do |y| %>
+          <li><%= link_to "Precálculo año #{y}", operadores_precalculo_year_path(y), class: "app-nav__link" %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% else %>
+    <p class="empty-state">No hay precálculos generados.</p>
+  <% end %>
+</div>
