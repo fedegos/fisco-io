@@ -1,0 +1,24 @@
+<% content_for :title, "Corregir por fuerza mayor - Operadores - Fisco.io" %>
+<div class="page-container">
+  <header class="page-header">
+    <p class="page-subtitle"><%= link_to "Padrón de objetos", operadores_padron_objetos_path %> → <%= link_to @obligacion.display_id, operadores_padron_objeto_path(@obligacion.obligation_id) %> → Corregir por fuerza mayor</p>
+    <h1 class="page-title">Corregir por fuerza mayor</h1>
+    <p class="page-subtitle id-internal">Partida: <%= @obligacion.obligation_id %></p>
+  </header>
+  <div class="card">
+    <%= form_with url: operadores_corregir_fuerza_mayor_padron_objeto_path(@obligacion.obligation_id), method: :patch, local: true do |f| %>
+      <div class="form-field">
+        <label for="operator_observations" class="form-field__label">Observaciones del operador (obligatorio)</label>
+        <%= text_area_tag :operator_observations, params[:operator_observations], class: "form-input", rows: 4, required: true, placeholder: "Ej. Error material en carga; datos de origen incorrectos." %>
+      </div>
+      <div class="form-field">
+        <label for="external_id" class="form-field__label">Identificador externo (si aplica)</label>
+        <%= text_field_tag :external_id, @obligacion.external_id, class: "form-input" %>
+      </div>
+      <div class="form-actions">
+        <%= f.submit "Registrar corrección", class: "btn btn--primary" %>
+        <%= link_to "Cancelar", operadores_padron_objeto_path(@obligacion.obligation_id), class: "btn btn--secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

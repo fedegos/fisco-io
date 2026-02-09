@@ -33,14 +33,11 @@ module Obligations
 
     # apply_* (scaffolding; sin lógica de negocio)
     def apply_TaxObligationCreated(event)
-      d = event.data
-      @obligation_id = d["obligation_id"]
-      @primary_subject_id = d["primary_subject_id"]
-      @tax_type = d["tax_type"]
-      @role = d["role"]
-      @status = d["status"]
-      @opened_at = d["opened_at"]
-      @account = TaxAccount.new(obligation_id: d["obligation_id"])
+      apply_obligation_opened_data(event.data)
+    end
+
+    def apply_ObligationOpened(event)
+      apply_obligation_opened_data(event.data)
     end
 
     def apply_TaxObligationUpdated(event)
@@ -49,9 +46,20 @@ module Obligations
     end
 
     def apply_TaxObligationClosed(event)
+      apply_obligation_closed_data(event.data)
+    end
+
+    def apply_ObligationClosed(event)
+      apply_obligation_closed_data(event.data)
+    end
+
+    def apply_RevaluationRegistered(_event)
+      # No state change on aggregate; projection updates FiscalValuation
+    end
+
+    def apply_ObligationCorrectedByForceMajeure(event)
       d = event.data
-      @status = "closed"
-      @closed_at = d["closed_at"]
+      # Only external_id is projected; aggregate could hold more if needed
     end
 
     def apply_TaxLiquidationCreated(_event)
@@ -73,6 +81,23 @@ module Obligations
     def apply_CoOwnerAdded(event)
       @co_subjects ||= []
       @co_subjects << event.data
+    end
+
+    private
+
+    def apply_obligation_opened_data(d)
+      @obligation_id = d["obligation_id"]
+      @primary_subject_id = d["primary_subject_id"]
+      @tax_type = d["tax_type"]
+      @role = d["role"]
+      @status = d["status"]
+      @opened_at = d["opened_at"]
+      @account = TaxAccount.new(obligation_id: d["obligation_id"])
+    end
+
+    def apply_obligation_closed_data(d)
+      @status = "closed"
+      @closed_at = d["closed_at"]
     end
   end
 end

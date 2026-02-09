@@ -8,7 +8,7 @@ COMPOSE = docker compose
 CORE = $(COMPOSE) run --rm core-engine
 WORKERS = $(COMPOSE) run --rm calculation-workers
 
-.PHONY: help up down build build-core-engine restart restart-postgres restart-redis restart-redpanda restart-core-engine restart-calculation-workers logs logs-postgres logs-redis logs-redpanda logs-core-engine logs-calculation-workers bundle migrate seed seed-replant console routes test-db test-core test-workers test lint-core lint-workers lint validate-asyncapi validate-openapi pip-install
+.PHONY: help up down build build-no-cache build-core-engine build-core-engine-no-cache restart restart-postgres restart-redis restart-redpanda restart-core-engine restart-calculation-workers logs logs-postgres logs-redis logs-redpanda logs-core-engine logs-calculation-workers bundle migrate seed seed-replant console routes test-db test-core test-workers test lint-core lint-workers lint validate-asyncapi validate-openapi pip-install
 
 .DEFAULT_GOAL := help
 
@@ -28,8 +28,14 @@ down: ## Bajar stack (detiene y elimina contenedores)
 build: ## Construir/actualizar imágenes Docker de core-engine y calculation-workers (hacer tras cambiar Gemfile)
 	$(COMPOSE) build
 
+build-no-cache: ## Reconstruir todas las imágenes sin usar caché (forzar reinstalación de dependencias)
+	$(COMPOSE) build --no-cache
+
 build-core-engine: ## Reconstruir solo la imagen core-engine (hacer tras cambiar Gemfile/Gemfile.lock)
 	$(COMPOSE) build core-engine
+
+build-core-engine-no-cache: ## Reconstruir core-engine sin caché; usar cuando añadas/quites gemas (ej. sprockets-rails)
+	$(COMPOSE) build --no-cache core-engine
 
 # --- Restart por servicio y conjunto ---
 restart: ## Reiniciar todos los servicios del stack

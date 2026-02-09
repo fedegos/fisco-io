@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 10) do
+ActiveRecord::Schema[8.1].define(version: 13) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -97,7 +97,12 @@ ActiveRecord::Schema[8.1].define(version: 10) do
   end
 
   create_table "subjects", primary_key: "subject_id", id: :uuid, default: nil, force: :cascade do |t|
+    t.string "address_line"
+    t.string "address_locality"
+    t.string "address_province"
+    t.jsonb "contact_entries", default: []
     t.datetime "created_at", null: false
+    t.uuid "digital_domicile_id"
     t.string "legal_name", null: false
     t.date "registration_date", null: false
     t.string "status", default: "active", null: false

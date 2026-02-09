@@ -5,7 +5,7 @@
 
 module Operadores
   class PadronObjetosController < ApplicationController
-    before_action :set_obligacion, only: [:show, :edit, :update, :cerrar, :create_valuacion, :update_valuacion]
+    before_action :set_obligacion, only: [:show, :edit, :update, :cerrar, :create_valuacion, :update_valuacion, :corregir_fuerza_mayor, :corregir_fuerza_mayor_update]
 
     def index
       @obligaciones = TaxAccountBalance.order(updated_at: :desc)
@@ -19,7 +19,7 @@ module Operadores
 
     def create
       obligation_id = params[:tax_account_balance][:obligation_id].presence || SecureRandom.uuid
-      cmd = Obligations::Commands::CreateTaxObligation.new(
+      cmd = Obligations::Commands::OpenObligation.new(
         obligation_id: obligation_id,
         primary_subject_id: params[:tax_account_balance][:subject_id].to_s.presence,
         tax_type: params[:tax_account_balance][:tax_type].to_s.presence || "inmobiliario",
@@ -32,8 +32,8 @@ module Operadores
         render :new, status: :unprocessable_entity
         return
       end
-      Obligations::Handlers::CreateTaxObligationHandler.new.call(cmd)
-      redirect_to operadores_padron_objeto_path(obligation_id), notice: "Obligación creada."
+      Obligations::Handlers::OpenObligationHandler.new.call(cmd)
+      redirect_to operadores_padron_objeto_path(obligation_id), notice: "Partida abierta."
     rescue StandardError => e
       flash.now[:alert] = "Error al crear: #{e.message}"
       @obligacion = TaxAccountBalance.new(**(params[:tax_account_balance]&.permit(:subject_id, :tax_type, :role, :external_id)&.to_h || {}).symbolize_keys)
@@ -53,15 +53,15 @@ module Operadores
         external_id: params[:tax_account_balance][:external_id].to_s.presence
       )
       Obligations::Handlers::UpdateObligationDataHandler.new.call(cmd)
-      redirect_to operadores_padron_objeto_path(@obligacion.obligation_id), notice: "Obligación actualizada."
+      redirect_to operadores_padron_objeto_path(@obligacion.obligation_id), notice: "Partida actualizada."
     rescue StandardError => e
       flash.now[:alert] = "Error al actualizar: #{e.message}"
       render :edit, status: :unprocessable_entity
     end
 
     def cerrar
-      Obligations::Handlers::CloseTaxObligationHandler.new.call(Obligations::Commands::CloseTaxObligation.new(obligation_id: @obligacion.obligation_id))
-      redirect_to operadores_padron_objetos_path, notice: "Obligación cerrada."
+      Obligations::Handlers::CloseObligationHandler.new.call(Obligations::Commands::CloseObligation.new(obligation_id: @obligacion.obligation_id))
+      redirect_to operadores_padron_objetos_path, notice: "Partida cerrada."
     rescue StandardError => e
       redirect_to operadores_padron_objetos_path, alert: "Error al cerrar: #{e.message}"
     end
@@ -73,11 +73,14 @@ module Operadores
         redirect_to operadores_padron_objeto_path(@obligacion.obligation_id), alert: "Año o valor inválido."
         return
       end
-      FiscalValuation.find_or_initialize_by(obligation_id: @obligacion.obligation_id, year: year).tap do |v|
-        v.value = value
-        v.save!
-      end
-      redirect_to operadores_padron_objeto_path(@obligacion.obligation_id), notice: "Valuación #{year} guardada."
+      cmd = Obligations::Commands::RegisterRevaluation.new(
+        obligation_id: @obligacion.obligation_id,
+        year: year,
+        value: value,
+        operator_observations: params[:operator_observations].to_s.presence
+      )
+      Obligations::Handlers::RegisterRevaluationHandler.new.call(cmd)
+      redirect_to operadores_padron_objeto_path(@obligacion.obligation_id), notice: "Revalúo #{year} registrado."
     rescue ActiveRecord::RecordInvalid => e
       redirect_to operadores_padron_objeto_path(@obligacion.obligation_id), alert: "Error al guardar valuación: #{e.message}"
     end
@@ -92,6 +95,28 @@ module Operadores
       redirect_to operadores_padron_objeto_path(@obligacion.obligation_id), alert: "Valuación no encontrada."
     rescue ActiveRecord::RecordInvalid => e
       redirect_to operadores_padron_objeto_path(@obligacion.obligation_id), alert: "Error al actualizar: #{e.message}"
+    end
+
+    def corregir_fuerza_mayor
+    end
+
+    def corregir_fuerza_mayor_update
+      obs = params[:operator_observations].to_s.strip
+      if obs.blank?
+        flash.now[:alert] = "Las observaciones del operador son obligatorias."
+        render :corregir_fuerza_mayor, status: :unprocessable_entity
+        return
+      end
+      cmd = Obligations::Commands::CorrectObligationByForceMajeure.new(
+        obligation_id: @obligacion.obligation_id,
+        operator_observations: obs,
+        external_id: params[:external_id].to_s.presence
+      )
+      Obligations::Handlers::CorrectObligationByForceMajeureHandler.new.call(cmd)
+      redirect_to operadores_padron_objeto_path(@obligacion.obligation_id), notice: "Corrección por fuerza mayor registrada."
+    rescue StandardError => e
+      flash.now[:alert] = "Error: #{e.message}"
+      render :corregir_fuerza_mayor, status: :unprocessable_entity
     end
 
     def export
@@ -123,14 +148,14 @@ module Operadores
           skipped += 1
           next
         end
-        cmd = Obligations::Commands::CreateTaxObligation.new(
+        cmd = Obligations::Commands::OpenObligation.new(
           obligation_id: obligation_id,
           primary_subject_id: primary_subject_id,
           tax_type: item["tax_type"].to_s.presence || "inmobiliario",
           role: item["role"].to_s.presence || "contribuyente",
           external_id: item["external_id"].to_s.presence
         )
-        Obligations::Handlers::CreateTaxObligationHandler.new.call(cmd)
+        Obligations::Handlers::OpenObligationHandler.new.call(cmd)
         created += 1
       rescue StandardError => e
         errors << "Fila #{idx + 1}: #{e.message}"

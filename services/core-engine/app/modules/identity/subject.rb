@@ -10,6 +10,8 @@ module Identity
   class Subject < BaseAggregate
     attr_accessor :subject_id, :tax_id, :legal_name, :trade_name,
                   :legal_segments, :administrative_segments, :representatives,
+                  :contact_entries,
+                  :address_province, :address_locality, :address_line,
                   :digital_domicile_id, :status, :registration_date
 
     def initialize(id: nil, version: 0, **attrs)
@@ -21,6 +23,10 @@ module Identity
       @legal_segments = attrs[:legal_segments] || []
       @administrative_segments = attrs[:administrative_segments] || []
       @representatives = attrs[:representatives] || []
+      @contact_entries = attrs[:contact_entries] || []
+      @address_province = attrs[:address_province]
+      @address_locality = attrs[:address_locality]
+      @address_line = attrs[:address_line]
       @digital_domicile_id = attrs[:digital_domicile_id]
       @status = attrs[:status]
       @registration_date = attrs[:registration_date]
@@ -28,7 +34,54 @@ module Identity
 
     # apply_* methods (scaffolding; sin lógica de negocio)
     def apply_SubjectRegistered(event)
+      apply_subject_enrolled_data(event.data)
+    end
+
+    def apply_SubjectEnrolled(event)
+      apply_subject_enrolled_data(event.data)
+    end
+
+    def apply_SubjectUpdated(event)
+      apply_contact_data(event.data)
+    end
+
+    def apply_SubjectContactDataUpdated(event)
+      apply_contact_data(event.data)
+    end
+
+    def apply_SubjectDomicileChanged(event)
       data = event.data
+      @address_province = data["address_province"] if data.key?("address_province")
+      @address_locality = data["address_locality"] if data.key?("address_locality")
+      @address_line = data["address_line"] if data.key?("address_line")
+      @digital_domicile_id = data["digital_domicile_id"] if data.key?("digital_domicile_id")
+    end
+
+    def apply_SubjectDeactivated(_event)
+      @status = "inactive"
+    end
+
+    def apply_SubjectCeased(_event)
+      @status = "inactive"
+    end
+
+    def apply_SubjectCorrectedByForceMajeure(event)
+      data = event.data
+      apply_contact_data(data) if data.key?("legal_name") || data.key?("trade_name")
+      @address_province = data["address_province"] if data.key?("address_province")
+      @address_locality = data["address_locality"] if data.key?("address_locality")
+      @address_line = data["address_line"] if data.key?("address_line")
+      @digital_domicile_id = data["digital_domicile_id"] if data.key?("digital_domicile_id")
+    end
+
+    def apply_SubjectSegmentChanged(event)
+      @legal_segments = event.data["legal_segments"] if event.data.key?("legal_segments")
+      @administrative_segments = event.data["administrative_segments"] if event.data.key?("administrative_segments")
+    end
+
+    private
+
+    def apply_subject_enrolled_data(data)
       @subject_id = data["subject_id"]
       @tax_id = data["tax_id"]
       @legal_name = data["legal_name"]
@@ -37,19 +90,10 @@ module Identity
       @registration_date = data["registration_date"]
     end
 
-    def apply_SubjectUpdated(event)
-      data = event.data
+    def apply_contact_data(data)
       @legal_name = data["legal_name"] if data.key?("legal_name")
       @trade_name = data["trade_name"] if data.key?("trade_name")
-    end
-
-    def apply_SubjectDeactivated(_event)
-      @status = "inactive"
-    end
-
-    def apply_SubjectSegmentChanged(event)
-      @legal_segments = event.data["legal_segments"] if event.data.key?("legal_segments")
-      @administrative_segments = event.data["administrative_segments"] if event.data.key?("administrative_segments")
+      @contact_entries = data["contact_entries"] if data.key?("contact_entries")
     end
   end
 end

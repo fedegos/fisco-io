@@ -15,8 +15,9 @@
   <p class="page-actions">
     <%= link_to "Editar", operadores_edit_padron_objeto_path(@obligacion.obligation_id), class: "btn btn--secondary" %>
     <%= link_to "Cuenta corriente", operadores_obligacion_path(@obligacion.obligation_id), class: "btn btn--secondary" %>
+    <%= link_to "Corregir (fuerza mayor)", operadores_corregir_fuerza_mayor_padron_objeto_path(@obligacion.obligation_id), class: "btn btn--secondary" %>
     <% if !@obligacion.respond_to?(:status) || @obligacion.status != "closed" %>
-      <%= button_to "Cerrar obligación", operadores_cerrar_padron_objeto_path(@obligacion.obligation_id), method: :patch, form: { data: { confirm: "¿Cerrar esta obligación?" } }, class: "btn btn--secondary" %>
+      <%= button_to "Cerrar partida", operadores_cerrar_padron_objeto_path(@obligacion.obligation_id), method: :patch, form: { data: { confirm: "¿Cerrar esta partida?" } }, class: "btn btn--secondary" %>
     <% end %>
   </p>
 
@@ -26,8 +27,8 @@
   </section>
 
   <section class="card card--spaced">
-    <h2 class="card__title">Valuaciones fiscales por período</h2>
-    <p class="card__description">Carga o edita la valuación fiscal por año para el cálculo inmobiliario.</p>
+    <h2 class="card__title">Revalúos (valuaciones fiscales por período)</h2>
+    <p class="card__description">Registra la valuación fiscal vigente por año para el cálculo inmobiliario.</p>
     <%= form_with url: operadores_padron_objeto_valuaciones_path(@obligacion.obligation_id), method: :post, local: true do |f| %>
       <div class="valuacion-form-row form-field">
         <div class="form-field">
@@ -39,7 +40,11 @@
           <input type="number" name="value" id="value" min="0" step="0.01" class="form-input form-input--number" required />
         </div>
         <div class="form-field">
-          <%= f.submit "Guardar valuación", class: "btn btn--primary" %>
+          <label for="operator_observations" class="form-field__label">Observaciones (opcional)</label>
+          <input type="text" name="operator_observations" id="operator_observations" class="form-input" placeholder="Ej. Revalúo oficial" />
+        </div>
+        <div class="form-field">
+          <%= f.submit "Registrar revalúo", class: "btn btn--primary" %>
         </div>
       </div>
     <% end %>

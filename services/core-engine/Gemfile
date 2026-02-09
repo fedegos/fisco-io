@@ -11,6 +11,7 @@ gem "rails", "~> 8.0"
 gem "puma", "~> 6.0"
 gem "pg", "~> 1.5"
 gem "redis", "~> 5.0"
+gem "sprockets-rails"
 gem "rspec-rails", "~> 7.0", group: :test
 gem "rubocop", "~> 1.60", group: :development
 gem "good_job", "~> 4.0"

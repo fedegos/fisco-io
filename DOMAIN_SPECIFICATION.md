@@ -2,6 +2,10 @@
 
 # Domain Specification
 
+**Operaciones de negocio (CQRS/DDD):** Los agregados no exponen CRUD genérico; cada operación tiene nombre de negocio, comando, evento y endpoint específicos. Ver [docs/domain/operations.md](docs/domain/operations.md) para el catálogo de operaciones por agregado (Subject, TaxObligation), parámetros, invariantes y endpoints API.
+
+---
+
 ## 1. Sujeto (Subject) y Obligaciones Múltiples
 
 ### Concepto Central

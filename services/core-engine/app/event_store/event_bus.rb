@@ -9,7 +9,8 @@ module EventStore
     DEFAULT_PROJECTORS = [
       Identity::Projections::SubjectProjection.new,
       Obligations::Projections::TaxAccountBalanceProjection.new,
-      Obligations::Projections::AccountMovementsProjection.new
+      Obligations::Projections::AccountMovementsProjection.new,
+      Obligations::Projections::FiscalValuationProjection.new
     ].freeze
 
     def initialize(projectors: nil)

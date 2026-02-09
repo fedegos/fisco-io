@@ -1,0 +1,60 @@
+<% content_for :title, "#{@sujeto.legal_name} - Padrón de sujetos - Fisco.io" %>
+<div class="page-container">
+  <header class="page-header">
+    <p class="page-subtitle"><%= link_to "Padrón de sujetos", operadores_padron_sujetos_path %> → Detalle</p>
+    <h1 class="page-title"><%= @sujeto.legal_name %></h1>
+    <p class="page-subtitle">
+      <span class="badge badge--muted"><%= @sujeto.status == "active" ? "Activo" : (@sujeto.status == "inactive" ? "Inactivo" : @sujeto.status) %></span>
+      <span class="id-internal">CUIT: <%= @sujeto.tax_id %></span>
+      <span class="id-internal">ID: <%= @sujeto.subject_id %></span>
+    </p>
+  </header>
+
+  <div class="page-actions page-actions--wrap">
+    <%= link_to "Actualizar datos de contacto", operadores_edit_padron_sujeto_path(@sujeto.subject_id), class: "btn btn--secondary" %>
+    <%= link_to "Mudar domicilio", operadores_domicilio_padron_sujeto_path(@sujeto.subject_id), class: "btn btn--secondary" %>
+    <%= link_to "Corregir (fuerza mayor)", operadores_corregir_fuerza_mayor_padron_sujeto_path(@sujeto.subject_id), class: "btn btn--secondary" %>
+    <% if @sujeto.status == "active" %>
+      <%= button_to "Cesar", operadores_cesar_padron_sujeto_path(@sujeto.subject_id), method: :patch, form: { data: { confirm: "¿Cesar este sujeto?" } }, class: "btn btn--secondary" %>
+    <% end %>
+  </div>
+
+  <section class="card card--spaced">
+    <h2 class="card__title card__title--sm">Identidad</h2>
+    <dl class="dl-list">
+      <dt>Razón social</dt>
+      <dd><%= @sujeto.legal_name %></dd>
+      <dt>Nombre de fantasía</dt>
+      <dd><%= @sujeto.trade_name.presence || "—" %></dd>
+      <dt>CUIT / N.º fiscal</dt>
+      <dd><%= @sujeto.tax_id %></dd>
+    </dl>
+  </section>
+
+  <section class="card card--spaced">
+    <h2 class="card__title card__title--sm">Domicilio físico principal</h2>
+    <% if @sujeto.try(:address_line).present? || @sujeto.try(:address_locality).present? || @sujeto.try(:address_province).present? %>
+      <p class="address-block">
+        <%= [@sujeto.try(:address_line), @sujeto.try(:address_locality), @sujeto.try(:address_province)].compact.join(", ") %>
+      </p>
+    <% else %>
+      <p class="form-field__hint">Sin domicilio cargado.</p>
+    <% end %>
+  </section>
+
+  <section class="card card--spaced">
+    <h2 class="card__title card__title--sm">Medios de contacto</h2>
+    <% entries = @sujeto.try(:contact_entries).presence || [] %>
+    <% if entries.any? %>
+      <ul class="contact-list">
+        <% entries.each do |ce| %>
+          <% type = (ce["type"] || ce[:type]).to_s %>
+          <% value = (ce["value"] || ce[:value]).to_s %>
+          <li><strong><%= type == "email" ? "Email" : (type == "phone" ? "Teléfono" : (type == "mobile" ? "Celular" : type)) %>:</strong> <%= value %></li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="form-field__hint">Sin contactos cargados.</p>
+    <% end %>
+  </section>
+</div>

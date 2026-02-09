@@ -1,0 +1,44 @@
+<% content_for :title, "Corregir por fuerza mayor - Operadores - Fisco.io" %>
+<div class="page-container">
+  <header class="page-header">
+    <p class="page-subtitle"><%= link_to "Padrón de sujetos", operadores_padron_sujetos_path %> → Corregir por fuerza mayor</p>
+    <h1 class="page-title">Corregir por fuerza mayor</h1>
+    <p class="page-subtitle id-internal">Sujeto: <%= @sujeto.subject_id %></p>
+  </header>
+  <div class="card">
+    <%= form_with url: operadores_corregir_fuerza_mayor_padron_sujeto_path(@sujeto.subject_id), method: :patch, local: true do |f| %>
+      <div class="form-field">
+        <label for="operator_observations" class="form-field__label">Observaciones del operador (obligatorio)</label>
+        <%= text_area_tag :operator_observations, params[:operator_observations], class: "form-input", rows: 4, required: true, placeholder: "Ej. Error material en carga previa; base de datos de origen con errores." %>
+      </div>
+      <div class="form-field">
+        <label for="legal_name" class="form-field__label">Razón social (si aplica)</label>
+        <%= text_field_tag :legal_name, @sujeto.legal_name, class: "form-input" %>
+      </div>
+      <div class="form-field">
+        <label for="trade_name" class="form-field__label">Nombre de fantasía (si aplica)</label>
+        <%= text_field_tag :trade_name, @sujeto.trade_name, class: "form-input" %>
+      </div>
+      <div class="form-field">
+        <label for="address_province" class="form-field__label">Provincia (si aplica)</label>
+        <%= text_field_tag :address_province, @sujeto.try(:address_province), class: "form-input" %>
+      </div>
+      <div class="form-field">
+        <label for="address_locality" class="form-field__label">Localidad (si aplica)</label>
+        <%= text_field_tag :address_locality, @sujeto.try(:address_locality), class: "form-input" %>
+      </div>
+      <div class="form-field">
+        <label for="address_line" class="form-field__label">Domicilio (si aplica)</label>
+        <%= text_field_tag :address_line, @sujeto.try(:address_line), class: "form-input" %>
+      </div>
+      <div class="form-field">
+        <label for="digital_domicile_id" class="form-field__label">ID domicilio digital (si aplica)</label>
+        <%= text_field_tag :digital_domicile_id, @sujeto.try(:digital_domicile_id), class: "form-input" %>
+      </div>
+      <div class="form-actions">
+        <%= f.submit "Registrar corrección", class: "btn btn--primary" %>
+        <%= link_to "Cancelar", operadores_padron_sujetos_path, class: "btn btn--secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

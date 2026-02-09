@@ -36,8 +36,14 @@ Rails.application.routes.draw do
     get "padron/sujetos", to: "padron_sujetos#index", as: :padron_sujetos
     get "padron/sujetos/new", to: "padron_sujetos#new", as: :new_padron_sujeto
     post "padron/sujetos", to: "padron_sujetos#create"
+    get "padron/sujetos/:id", to: "padron_sujetos#show", as: :padron_sujeto
     get "padron/sujetos/:id/edit", to: "padron_sujetos#edit", as: :edit_padron_sujeto
-    patch "padron/sujetos/:id", to: "padron_sujetos#update", as: :padron_sujeto
+    patch "padron/sujetos/:id", to: "padron_sujetos#update", as: :update_padron_sujeto
+    get "padron/sujetos/:id/domicilio", to: "padron_sujetos#domicilio", as: :domicilio_padron_sujeto
+    patch "padron/sujetos/:id/domicilio", to: "padron_sujetos#domicilio_update"
+    patch "padron/sujetos/:id/cesar", to: "padron_sujetos#desactivar", as: :cesar_padron_sujeto
+    get "padron/sujetos/:id/corregir_fuerza_mayor", to: "padron_sujetos#corregir_fuerza_mayor", as: :corregir_fuerza_mayor_padron_sujeto
+    patch "padron/sujetos/:id/corregir_fuerza_mayor", to: "padron_sujetos#corregir_fuerza_mayor_update"
     patch "padron/sujetos/:id/desactivar", to: "padron_sujetos#desactivar", as: :desactivar_padron_sujeto
     get "padron/sujetos/export", to: "padron_sujetos#export", as: :padron_sujetos_export
     post "padron/sujetos/import", to: "padron_sujetos#import", as: :padron_sujetos_import
@@ -50,12 +56,25 @@ Rails.application.routes.draw do
     get "padron/objetos/:id/edit", to: "padron_objetos#edit", as: :edit_padron_objeto
     patch "padron/objetos/:id", to: "padron_objetos#update"
     patch "padron/objetos/:id/cerrar", to: "padron_objetos#cerrar", as: :cerrar_padron_objeto
+    get "padron/objetos/:id/corregir_fuerza_mayor", to: "padron_objetos#corregir_fuerza_mayor", as: :corregir_fuerza_mayor_padron_objeto
+    patch "padron/objetos/:id/corregir_fuerza_mayor", to: "padron_objetos#corregir_fuerza_mayor_update"
     post "padron/objetos/:id/valuaciones", to: "padron_objetos#create_valuacion", as: :padron_objeto_valuaciones
     patch "padron/objetos/:id/valuaciones/:year", to: "padron_objetos#update_valuacion", as: :padron_objeto_valuacion
   end
 
   namespace :api, defaults: { format: :json } do
     resources :subjects, only: [:index, :create]
+    get "sujetos", to: "sujetos#index"
+    post "sujetos/empadronar", to: "sujetos#empadronar"
+    patch "sujetos/:id/datos_contacto", to: "sujetos#datos_contacto"
+    patch "sujetos/:id/domicilio", to: "sujetos#domicilio"
+    patch "sujetos/:id/cesar", to: "sujetos#cesar"
+    patch "sujetos/:id/corregir_fuerza_mayor", to: "sujetos#corregir_fuerza_mayor"
+    get "partidas", to: "partidas#index"
+    post "partidas/abrir", to: "partidas#abrir"
+    post "partidas/:id/revaluos", to: "partidas#revaluos"
+    patch "partidas/:id/cerrar", to: "partidas#cerrar"
+    patch "partidas/:id/corregir_fuerza_mayor", to: "partidas#corregir_fuerza_mayor"
     resources :obligations, only: [:index, :show, :create] do
       get "movements", on: :member, to: "movements#index"
       post "liquidations", on: :member, to: "liquidations#create"

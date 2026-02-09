@@ -7,9 +7,34 @@ module Obligations
   module Projections
     class TaxAccountBalanceProjection < BaseProjection
       def handle_TaxObligationCreated(event)
+        apply_obligation_opened(event.data)
+      end
+
+      def handle_ObligationOpened(event)
+        apply_obligation_opened(event.data)
+      end
+
+      def handle_TaxObligationUpdated(event)
+        apply_obligation_updated(event)
+      end
+
+      def handle_ObligationCorrectedByForceMajeure(event)
+        apply_obligation_updated(event)
+      end
+
+      def handle_TaxObligationClosed(event)
+        apply_obligation_closed(event)
+      end
+
+      def handle_ObligationClosed(event)
+        apply_obligation_closed(event)
+      end
+
+      private
+
+      def apply_obligation_opened(data)
         return unless TaxAccountBalance.table_exists?
 
-        data = event.data
         record = TaxAccountBalance.find_or_initialize_by(obligation_id: data["obligation_id"])
         return if record.persisted? # idempotencia
 
@@ -27,7 +52,7 @@ module Obligations
         record.save!
       end
 
-      def handle_TaxObligationUpdated(event)
+      def apply_obligation_updated(event)
         return unless TaxAccountBalance.table_exists?
 
         record = TaxAccountBalance.find_by(obligation_id: event.aggregate_id)
@@ -39,7 +64,7 @@ module Obligations
         record.update!(attrs) if attrs.any?
       end
 
-      def handle_TaxObligationClosed(event)
+      def apply_obligation_closed(event)
         return unless TaxAccountBalance.table_exists?
 
         record = TaxAccountBalance.find_by(obligation_id: event.aggregate_id)
@@ -52,6 +77,8 @@ module Obligations
         attrs[:closed_at] = closed_at if record.respond_to?(:closed_at=)
         record.update!(attrs) if attrs.any?
       end
+
+      public
 
       def handle_TaxLiquidationCreated(event)
         return unless TaxAccountBalance.table_exists?

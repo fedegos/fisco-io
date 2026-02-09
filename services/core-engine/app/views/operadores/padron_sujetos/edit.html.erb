@@ -1,17 +1,18 @@
-<% content_for :title, "Editar sujeto - Operadores - Fisco.io" %>
+<% content_for :title, "Actualizar datos de contacto - Operadores - Fisco.io" %>
 <div class="page-container">
   <header class="page-header">
-    <p class="page-subtitle"><%= link_to "Padrón de sujetos", operadores_padron_sujetos_path %> → Editar</p>
-    <h1 class="page-title">Editar sujeto</h1>
+    <p class="page-subtitle"><%= link_to "Padrón de sujetos", operadores_padron_sujetos_path %> → Actualizar datos de contacto</p>
+    <h1 class="page-title">Actualizar datos de contacto</h1>
     <p class="page-subtitle id-internal">ID: <%= @sujeto.subject_id %></p>
   </header>
   <div class="card">
-    <%= form_with model: @sujeto, url: operadores_padron_sujeto_path(@sujeto.subject_id), method: :patch, local: true do |f| %>
+    <%= form_with model: @sujeto, url: operadores_update_padron_sujeto_path(@sujeto.subject_id), method: :patch, local: true do |f| %>
       <div class="form-field">
         <%= f.label :tax_id, "CUIT / N.º fiscal" %>
         <%= f.text_field :tax_id, class: "form-input", disabled: true %>
         <p class="form-field__hint">No editable (identificador fiscal).</p>
       </div>
+      <h3 class="card__title card__title--sm" style="margin-top: var(--space-lg);">Razón social y nombre de fantasía</h3>
       <div class="form-field">
         <%= f.label :legal_name, "Razón social" %>
         <%= f.text_field :legal_name, class: "form-input", required: true %>
@@ -20,7 +21,35 @@
         <%= f.label :trade_name, "Nombre de fantasía" %>
         <%= f.text_field :trade_name, class: "form-input" %>
       </div>
-      <div class="form-actions">
+
+      <h3 class="card__title card__title--sm" style="margin-top: var(--space-lg);">Medios de contacto</h3>
+      <p class="form-field__hint">Email, teléfono o celular. Dejar tipo y valor en blanco para no incluir.</p>
+      <% entries = @sujeto.try(:contact_entries).presence || [] %>
+      <% rows = (entries.size + 2).clamp(1, 10) %>
+      <% rows.times do |i| %>
+        <% ce = entries[i] || {} %>
+        <% type_val = ce.is_a?(Hash) ? (ce["type"] || ce[:type]) : nil %>
+        <% value_val = ce.is_a?(Hash) ? (ce["value"] || ce[:value]) : nil %>
+        <div class="form-field contact-entry-row" data-contact-index="<%= i %>">
+          <div class="form-row form-row--gap">
+            <div class="form-field" style="flex: 0 0 10rem;">
+              <label for="contact_entries_<%= i %>_type" class="form-field__label">Tipo</label>
+              <select name="subject_read_model[contact_entries][<%= i %>][type]" id="contact_entries_<%= i %>_type" class="form-input">
+                <option value="">—</option>
+                <option value="email" <%= type_val == "email" ? "selected" : "" %>>Email</option>
+                <option value="phone" <%= type_val == "phone" ? "selected" : "" %>>Teléfono</option>
+                <option value="mobile" <%= type_val == "mobile" ? "selected" : "" %>>Celular</option>
+              </select>
+            </div>
+            <div class="form-field" style="flex: 1;">
+              <label for="contact_entries_<%= i %>_value" class="form-field__label">Valor</label>
+              <input type="text" name="subject_read_model[contact_entries][<%= i %>][value]" id="contact_entries_<%= i %>_value" class="form-input" value="<%= value_val %>" placeholder="Ej. correo@ejemplo.com o +54 11 1234-5678" />
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="form-actions" style="margin-top: var(--space-lg);">
         <%= f.submit "Guardar", class: "btn btn--primary" %>
         <%= link_to "Cancelar", operadores_padron_sujetos_path, class: "btn btn--secondary" %>
       </div>

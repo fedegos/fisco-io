@@ -1,0 +1,28 @@
+<% content_for :title, "Mudar domicilio - Operadores - Fisco.io" %>
+<div class="page-container">
+  <header class="page-header">
+    <p class="page-subtitle"><%= link_to "Padrón de sujetos", operadores_padron_sujetos_path %> → Mudar domicilio</p>
+    <h1 class="page-title">Domicilio físico principal</h1>
+    <p class="page-subtitle id-internal">Sujeto: <%= @sujeto.subject_id %></p>
+  </header>
+  <div class="card">
+    <%= form_with model: @sujeto, url: operadores_domicilio_padron_sujeto_path(@sujeto.subject_id), method: :patch, local: true do |f| %>
+      <div class="form-field">
+        <%= f.label :address_province, "Provincia" %>
+        <%= f.text_field :address_province, class: "form-input", value: @sujeto.try(:address_province), placeholder: "Ej. Buenos Aires" %>
+      </div>
+      <div class="form-field">
+        <%= f.label :address_locality, "Localidad" %>
+        <%= f.text_field :address_locality, class: "form-input", value: @sujeto.try(:address_locality), placeholder: "Ej. La Plata" %>
+      </div>
+      <div class="form-field">
+        <%= f.label :address_line, "Domicilio (calle, número, piso/depto)" %>
+        <%= f.text_field :address_line, class: "form-input", value: @sujeto.try(:address_line), placeholder: "Ej. Calle 50 1234, Piso 2" %>
+      </div>
+      <div class="form-actions">
+        <%= f.submit "Guardar", class: "btn btn--primary" %>
+        <%= link_to "Cancelar", operadores_padron_sujetos_path, class: "btn btn--secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -240,6 +240,14 @@ GEM
       prism (~> 1.7)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
+    sprockets (4.2.2)
+      concurrent-ruby (~> 1.0)
+      logger
+      rack (>= 2.2.4, < 4)
+    sprockets-rails (3.5.2)
+      actionpack (>= 6.1)
+      activesupport (>= 6.1)
+      sprockets (>= 3.0.0)
     stringio (3.2.0)
     thor (1.5.0)
     timeout (0.6.0)
@@ -269,6 +277,7 @@ DEPENDENCIES
   redis (~> 5.0)
   rspec-rails (~> 7.0)
   rubocop (~> 1.60)
+  sprockets-rails
 
 RUBY VERSION
    ruby 3.2.10p266

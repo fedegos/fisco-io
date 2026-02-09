@@ -10,6 +10,7 @@ require "active_model/railtie"
 require "active_record/railtie"
 require "action_controller/railtie"
 require "action_view/railtie"
+require "sprockets/railtie"
 
 Bundler.require(*Rails.groups)
 
@@ -21,5 +22,9 @@ module CoreEngine
 
     # Incluir app/ para que Zeitwerk cargue event_store, modules, etc.
     config.autoload_paths << Rails.root.join("app")
+
+    # Assets: precompilar application.css y application.js
+    config.assets.enabled = true
+    config.assets.version = "1.0"
   end
 end

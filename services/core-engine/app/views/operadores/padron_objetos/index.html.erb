@@ -3,12 +3,12 @@
 <div class="page-container">
   <header class="page-header">
     <p class="page-subtitle"><%= link_to "Operadores", operadores_root_path %> → Padrones</p>
-    <h1 class="page-title">Padrón de objetos (obligaciones)</h1>
+    <h1 class="page-title">Padrón de objetos (partidas)</h1>
     <p class="page-subtitle">Listado, exportación e importación idempotente por UUID (ID de obligación).</p>
   </header>
 
   <p class="page-actions">
-    <%= link_to "Alta de obligación", operadores_new_padron_objeto_path, class: "btn btn--primary" %>
+    <%= link_to "Abrir partida", operadores_new_padron_objeto_path, class: "btn btn--primary" %>
   </p>
 
   <div class="filters-bar">
@@ -58,12 +58,13 @@
               </td>
               <td><%= number_to_currency(ob.current_balance) %></td>
               <td><%= ob.last_liquidation_date&.to_s %></td>
-              <td>
-                <%= link_to "Ver", operadores_padron_objeto_path(ob.obligation_id), class: "app-nav__link" %>
-                | <%= link_to "Editar", operadores_edit_padron_objeto_path(ob.obligation_id), class: "app-nav__link" %>
-                | <%= link_to "Cuenta corriente", operadores_obligacion_path(ob.obligation_id), class: "app-nav__link" %>
+              <td class="actions-cell">
+                <%= link_to "Ver", operadores_padron_objeto_path(ob.obligation_id), class: "btn btn--secondary btn--sm" %>
+                <%= link_to "Editar", operadores_edit_padron_objeto_path(ob.obligation_id), class: "btn btn--secondary btn--sm" %>
+                <%= link_to "Cuenta corriente", operadores_obligacion_path(ob.obligation_id), class: "btn btn--secondary btn--sm" %>
+                <%= link_to "Corregir (fuerza mayor)", operadores_corregir_fuerza_mayor_padron_objeto_path(ob.obligation_id), class: "btn btn--secondary btn--sm" %>
                 <% if !ob.respond_to?(:status) || ob.status != "closed" %>
-                  | <%= button_to "Cerrar", operadores_cerrar_padron_objeto_path(ob.obligation_id), method: :patch, form: { data: { confirm: "¿Cerrar esta obligación?" } }, class: "btn btn--secondary btn--sm-inline" %>
+                  <%= button_to "Cerrar partida", operadores_cerrar_padron_objeto_path(ob.obligation_id), method: :patch, form: { data: { confirm: "¿Cerrar esta partida?" } }, class: "btn btn--secondary btn--sm" %>
                 <% end %>
               </td>
             </tr>

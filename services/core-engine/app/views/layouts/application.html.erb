@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/stylesheets/application.css">
+  <%= stylesheet_link_tag "application", media: "all" %>
   <script src="https://unpkg.com/htmx.org@1.9.10" crossorigin="anonymous"></script>
   <%= csrf_meta_tags %>
   <%= content_for(:head) %>
@@ -34,20 +34,13 @@
       <% end %>
       <%= yield %>
     </main>
+
+    <footer class="app-footer">
+      <div class="app-footer__inner">
+        <span class="app-footer__copy">Fisco.io — Framework de Administración Tributaria</span>
+      </div>
+    </footer>
   </div>
-  <script>
-    (function() {
-      var flashes = document.querySelectorAll('[data-flash]');
-      flashes.forEach(function(el) {
-        var t = setTimeout(function() { el.style.display = 'none'; }, 5000);
-        el.addEventListener('click', function() { clearTimeout(t); el.style.display = 'none'; });
-      });
-      document.querySelectorAll('form[data-confirm]').forEach(function(form) {
-        form.addEventListener('submit', function(e) {
-          if (!confirm(form.getAttribute('data-confirm'))) e.preventDefault();
-        });
-      });
-    })();
-  </script>
+  <%= javascript_include_tag "application" %>
 </body>
 </html>
