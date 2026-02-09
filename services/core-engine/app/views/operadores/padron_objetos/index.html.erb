@@ -60,12 +60,19 @@
               <td><%= ob.last_liquidation_date&.to_s %></td>
               <td class="actions-cell">
                 <%= link_to "Ver", operadores_padron_objeto_path(ob.obligation_id), class: "btn btn--secondary btn--sm" %>
-                <%= link_to "Editar", operadores_edit_padron_objeto_path(ob.obligation_id), class: "btn btn--secondary btn--sm" %>
-                <%= link_to "Cuenta corriente", operadores_obligacion_path(ob.obligation_id), class: "btn btn--secondary btn--sm" %>
-                <%= link_to "Corregir (fuerza mayor)", operadores_corregir_fuerza_mayor_padron_objeto_path(ob.obligation_id), class: "btn btn--secondary btn--sm" %>
-                <% if !ob.respond_to?(:status) || ob.status != "closed" %>
-                  <%= button_to "Cerrar partida", operadores_cerrar_padron_objeto_path(ob.obligation_id), method: :patch, form: { data: { controller: "confirm", confirm: "¿Cerrar esta partida?" } }, class: "btn btn--secondary btn--sm" %>
-                <% end %>
+                <details class="actions-dropdown" data-controller="dropdown">
+                  <summary class="btn btn--secondary btn--sm" aria-haspopup="listbox">Acciones</summary>
+                  <ul class="actions-dropdown__menu" role="menu" data-dropdown-target="menu">
+                    <li><%= link_to "Editar", operadores_edit_padron_objeto_path(ob.obligation_id), role: "menuitem", class: "actions-dropdown__link" %></li>
+                    <li><%= link_to "Cuenta corriente", operadores_obligacion_path(ob.obligation_id), role: "menuitem", class: "actions-dropdown__link" %></li>
+                    <li><%= link_to "Corregir (fuerza mayor)", operadores_corregir_fuerza_mayor_padron_objeto_path(ob.obligation_id), role: "menuitem", class: "actions-dropdown__link" %></li>
+                    <% if !ob.respond_to?(:status) || ob.status != "closed" %>
+                      <li>
+                        <%= button_to "Cerrar partida", operadores_cerrar_padron_objeto_path(ob.obligation_id), method: :patch, form: { data: { controller: "confirm", confirm: "¿Cerrar esta partida?" } } %>
+                      </li>
+                    <% end %>
+                  </ul>
+                </details>
               </td>
             </tr>
           <% end %>
@@ -77,4 +84,7 @@
       </tbody>
     </table>
   </div>
+  <% if @total_count && @total_count > 0 %>
+    <%= render "shared/pagination", page: @page, per_page: @per_page, total_count: @total_count %>
+  <% end %>
 </div>

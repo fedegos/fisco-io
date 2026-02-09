@@ -77,4 +77,7 @@
       </tbody>
     </table>
   </div>
+  <% if @total_count && @total_count > 0 %>
+    <%= render "shared/pagination", page: @page, per_page: @per_page, total_count: @total_count %>
+  <% end %>
 </div>

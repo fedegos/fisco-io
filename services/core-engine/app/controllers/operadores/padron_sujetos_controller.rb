@@ -7,9 +7,16 @@ module Operadores
   class PadronSujetosController < ApplicationController
     before_action :set_sujeto, only: [:show, :edit, :update, :desactivar, :domicilio, :domicilio_update, :corregir_fuerza_mayor, :corregir_fuerza_mayor_update]
 
+    PER_PAGE = 25
+    MAX_PER_PAGE = 100
+
     def index
-      @sujetos = SubjectReadModel.order(created_at: :desc)
-      @sujetos = @sujetos.where("legal_name ILIKE ? OR tax_id ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
+      scope = SubjectReadModel.order(created_at: :desc)
+      scope = scope.where("legal_name ILIKE ? OR tax_id ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
+      @total_count = scope.count
+      @per_page = [(params[:per_page].to_i.positive? ? params[:per_page].to_i : PER_PAGE), MAX_PER_PAGE].min
+      @page = [params[:page].to_i, 1].max
+      @sujetos = scope.offset((@page - 1) * @per_page).limit(@per_page)
     end
 
     def new

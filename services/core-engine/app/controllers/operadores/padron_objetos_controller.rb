@@ -7,10 +7,17 @@ module Operadores
   class PadronObjetosController < ApplicationController
     before_action :set_obligacion, only: [:show, :edit, :update, :cerrar, :create_valuacion, :update_valuacion, :corregir_fuerza_mayor, :corregir_fuerza_mayor_update]
 
+    PER_PAGE = 25
+    MAX_PER_PAGE = 100
+
     def index
-      @obligaciones = TaxAccountBalance.order(updated_at: :desc)
-      @obligaciones = @obligaciones.where(tax_type: params[:tax_type]) if params[:tax_type].present?
-      @obligaciones = @obligaciones.where("external_id ILIKE ? OR obligation_id::text ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
+      scope = TaxAccountBalance.order(updated_at: :desc)
+      scope = scope.where(tax_type: params[:tax_type]) if params[:tax_type].present?
+      scope = scope.where("external_id ILIKE ? OR obligation_id::text ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
+      @total_count = scope.count
+      @per_page = [(params[:per_page].to_i.positive? ? params[:per_page].to_i : PER_PAGE), MAX_PER_PAGE].min
+      @page = [params[:page].to_i, 1].max
+      @obligaciones = scope.offset((@page - 1) * @per_page).limit(@per_page)
     end
 
     def new

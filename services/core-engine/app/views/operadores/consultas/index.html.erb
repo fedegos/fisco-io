@@ -3,42 +3,34 @@
 <div class="page-container">
   <header class="page-header">
     <h1 class="page-title">Consultas (modelos de lectura)</h1>
-    <p class="page-subtitle">Proyecciones disponibles: sujetos y saldos por obligación. Vista previa y enlaces a la API.</p>
+    <p class="page-subtitle">Proyecciones disponibles: sujetos y saldos por obligación. Acceda a los listados con filtros y paginación, o use la API.</p>
   </header>
+
+  <p class="page-intro text-muted">
+    Los volúmenes pueden ser de cientos de miles de registros. Use el <strong>padrón de sujetos</strong> o el <strong>padrón de objetos</strong> para buscar y paginar; no se muestran listados aquí para evitar cargar todo en memoria.
+  </p>
 
   <div class="card-grid">
     <section class="card">
-      <h2 class="card__title card__title--sm">Sujetos</h2>
+      <h2 class="card__title card__title--sm">Sujetos (identidad)</h2>
       <p class="card__description">
-        Proyección de sujetos (identidad). Total: <strong><%= @subjects_count %></strong>.
-        API: <code>GET /api/subjects</code>
+        Proyección de sujetos del padrón. Listado paginado con búsqueda por nombre o CUIT.
       </p>
-      <% if @subjects_sample.any? %>
-        <ul class="list-unstyled list-unstyled--bullets text-small">
-          <% @subjects_sample.each do |s| %>
-            <li><%= s.legal_name %> (<%= s.tax_id %>)</li>
-          <% end %>
-        </ul>
-      <% else %>
-        <p class="empty-state">Sin datos.</p>
-      <% end %>
+      <ul class="list-unstyled card__actions">
+        <li><%= link_to "Ver padrón de sujetos", operadores_padron_sujetos_path, class: "btn btn--primary" %></li>
+        <li class="meta-line text-small text-muted">API: <code>GET /api/subjects</code></li>
+      </ul>
     </section>
 
     <section class="card">
       <h2 class="card__title card__title--sm">Saldos por obligación</h2>
       <p class="card__description">
-        Proyección de saldos por obligación. Total: <strong><%= @obligations_count %></strong>.
-        API: <code>GET /api/obligations</code>
+        Proyección de saldos por obligación (partidas). Listado paginado con filtro por tipo e identificador.
       </p>
-      <% if @obligations_sample.any? %>
-        <ul class="list-unstyled list-unstyled--bullets text-small">
-          <% @obligations_sample.each do |ob| %>
-            <li><span class="badge badge--muted"><%= ob.tax_type %></span> <%= link_to ob.display_id, operadores_obligacion_path(ob.obligation_id) %> — <%= number_to_currency(ob.current_balance) %></li>
-          <% end %>
-        </ul>
-      <% else %>
-        <p class="empty-state">Sin datos.</p>
-      <% end %>
+      <ul class="list-unstyled card__actions">
+        <li><%= link_to "Ver padrón de objetos", operadores_padron_objetos_path, class: "btn btn--primary" %></li>
+        <li class="meta-line text-small text-muted">API: <code>GET /api/obligations</code></li>
+      </ul>
     </section>
   </div>
 </div>

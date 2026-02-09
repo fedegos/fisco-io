@@ -1,15 +1,11 @@
 # frozen_string_literal: true
 
 # Fisco.io - Portal operadores: consultas (read models / proyecciones)
-# Resumen de proyecciones disponibles y acceso a listados
-
+# Hub de acceso a proyecciones: sin listados embebidos (no escala). Enlaces a padrones (paginados/filtrados) y API.
 module Operadores
   class ConsultasController < ApplicationController
     def index
-      @subjects_count = SubjectReadModel.count
-      @obligations_count = TaxAccountBalance.count
-      @subjects_sample = SubjectReadModel.order(created_at: :desc).limit(5)
-      @obligations_sample = TaxAccountBalance.order(updated_at: :desc).limit(5)
+      # No cargar muestras ni counts costosos a escala; la consulta real se hace en padrones con filtros y paginación
     end
   end
 end

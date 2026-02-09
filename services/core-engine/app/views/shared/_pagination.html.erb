@@ -1,0 +1,22 @@
+<%# Paginación: preserva query params (q, tax_type, etc.) %>
+<% page = local_assigns[:page].to_i %>
+<% per_page = local_assigns[:per_page].to_i %>
+<% total_count = local_assigns[:total_count].to_i %>
+<% total_pages = per_page.positive? ? (total_count.to_f / per_page).ceil : 1 %>
+<% from = total_count.zero? ? 0 : (page - 1) * per_page + 1 %>
+<% to = [page * per_page, total_count].min %>
+
+<nav class="pagination" aria-label="Paginación">
+  <p class="pagination__summary text-small text-muted">
+    Mostrando <%= from %>–<%= to %> de <%= total_count %>
+  </p>
+  <ul class="pagination__links list-unstyled">
+    <% if page > 1 %>
+      <li><%= link_to "← Anterior", request.path + "?" + request.query_parameters.merge("page" => page - 1).to_query, class: "pagination__link" %></li>
+    <% end %>
+    <li class="pagination__current">Página <%= page %> de <%= total_pages %></li>
+    <% if page < total_pages %>
+      <li><%= link_to "Siguiente →", request.path + "?" + request.query_parameters.merge("page" => page + 1).to_query, class: "pagination__link" %></li>
+    <% end %>
+  </ul>
+</nav>
