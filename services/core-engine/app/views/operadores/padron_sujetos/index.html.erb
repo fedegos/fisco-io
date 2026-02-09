@@ -53,15 +53,15 @@
               <td><span class="badge badge--muted"><%= s.status == "active" ? "Activo" : (s.status == "inactive" ? "Inactivo" : s.status) %></span></td>
               <td class="actions-cell">
                 <%= link_to "Ver", operadores_padron_sujeto_path(s.subject_id), class: "btn btn--secondary btn--sm" %>
-                <details class="actions-dropdown">
+                <details class="actions-dropdown" data-controller="dropdown">
                   <summary class="btn btn--secondary btn--sm" aria-haspopup="listbox">Acciones</summary>
-                  <ul class="actions-dropdown__menu" role="menu">
+                  <ul class="actions-dropdown__menu" role="menu" data-dropdown-target="menu">
                     <li><%= link_to "Datos de contacto", operadores_edit_padron_sujeto_path(s.subject_id), role: "menuitem", class: "actions-dropdown__link" %></li>
                     <li><%= link_to "Mudar domicilio", operadores_domicilio_padron_sujeto_path(s.subject_id), role: "menuitem", class: "actions-dropdown__link" %></li>
                     <li><%= link_to "Corregir (fuerza mayor)", operadores_corregir_fuerza_mayor_padron_sujeto_path(s.subject_id), role: "menuitem", class: "actions-dropdown__link" %></li>
                     <% if s.status == "active" %>
                       <li>
-                        <%= button_to "Cesar", operadores_cesar_padron_sujeto_path(s.subject_id), method: :patch, form: { data: { confirm: "¿Cesar este sujeto?" } } %>
+                        <%= button_to "Cesar", operadores_cesar_padron_sujeto_path(s.subject_id), method: :patch, form: { data: { controller: "confirm", confirm: "¿Cesar este sujeto?" } } %>
                       </li>
                     <% end %>
                   </ul>

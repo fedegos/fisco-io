@@ -6,8 +6,8 @@
   </header>
   <p class="page-actions">
     <%= button_to "Validar resultados", operadores_validar_precalculo_path(@year), method: :patch, class: "btn btn--secondary" %>
-    <%= button_to "Revertir precálculo", operadores_revertir_precalculo_path(@year), method: :delete, form: { data: { confirm: "¿Eliminar todo el precálculo de este año?" } }, class: "btn btn--secondary" %>
-    <%= button_to "Pasar a producción", operadores_producir_precalculo_path(@year), method: :patch, form: { data: { confirm: "¿Crear liquidaciones definitivas para todos los registros del precálculo?" } }, class: "btn btn--primary" %>
+    <%= button_to "Revertir precálculo", operadores_revertir_precalculo_path(@year), method: :delete, form: { data: { controller: "confirm", confirm: "¿Eliminar todo el precálculo de este año?" } }, class: "btn btn--secondary" %>
+    <%= button_to "Pasar a producción", operadores_producir_precalculo_path(@year), method: :patch, form: { data: { controller: "confirm", confirm: "¿Crear liquidaciones definitivas para todos los registros del precálculo?" } }, class: "btn btn--primary" %>
   </p>
   <div class="table-wrapper">
     <table class="table" role="grid" aria-label="Precálculo por obligación">

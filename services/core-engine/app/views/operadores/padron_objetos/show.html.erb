@@ -17,7 +17,7 @@
     <%= link_to "Cuenta corriente", operadores_obligacion_path(@obligacion.obligation_id), class: "btn btn--secondary" %>
     <%= link_to "Corregir (fuerza mayor)", operadores_corregir_fuerza_mayor_padron_objeto_path(@obligacion.obligation_id), class: "btn btn--secondary" %>
     <% if !@obligacion.respond_to?(:status) || @obligacion.status != "closed" %>
-      <%= button_to "Cerrar partida", operadores_cerrar_padron_objeto_path(@obligacion.obligation_id), method: :patch, form: { data: { confirm: "¿Cerrar esta partida?" } }, class: "btn btn--secondary" %>
+      <%= button_to "Cerrar partida", operadores_cerrar_padron_objeto_path(@obligacion.obligation_id), method: :patch, form: { data: { controller: "confirm", confirm: "¿Cerrar esta partida?" } }, class: "btn btn--secondary" %>
     <% end %>
   </p>
 

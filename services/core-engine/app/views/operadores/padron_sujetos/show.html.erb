@@ -15,7 +15,7 @@
     <%= link_to "Mudar domicilio", operadores_domicilio_padron_sujeto_path(@sujeto.subject_id), class: "btn btn--secondary" %>
     <%= link_to "Corregir (fuerza mayor)", operadores_corregir_fuerza_mayor_padron_sujeto_path(@sujeto.subject_id), class: "btn btn--secondary" %>
     <% if @sujeto.status == "active" %>
-      <%= button_to "Cesar", operadores_cesar_padron_sujeto_path(@sujeto.subject_id), method: :patch, form: { data: { confirm: "¿Cesar este sujeto?" } }, class: "btn btn--secondary" %>
+      <%= button_to "Cesar", operadores_cesar_padron_sujeto_path(@sujeto.subject_id), method: :patch, form: { data: { controller: "confirm", confirm: "¿Cesar este sujeto?" } }, class: "btn btn--secondary" %>
     <% end %>
   </div>
 

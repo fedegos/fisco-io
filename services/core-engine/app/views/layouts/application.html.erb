@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <%= stylesheet_link_tag "application", media: "all" %>
+  <%= stylesheet_link_tag "application", media: "all", "data-turbo-track": "reload" %>
   <script src="https://unpkg.com/htmx.org@1.9.10" crossorigin="anonymous"></script>
   <%= csrf_meta_tags %>
   <%= content_for(:head) %>
@@ -24,13 +24,13 @@
 
     <main class="app-main" id="main-content">
       <% if flash[:notice].present? %>
-        <div class="flash flash--notice flash--auto-dismiss" role="status" data-flash><%= flash[:notice] %></div>
+        <div class="flash flash--notice flash--auto-dismiss" role="status" data-controller="flash"><%= flash[:notice] %></div>
       <% end %>
       <% if flash[:alert].present? %>
-        <div class="flash flash--alert flash--auto-dismiss" role="alert" data-flash><%= flash[:alert] %></div>
+        <div class="flash flash--alert flash--auto-dismiss" role="alert" data-controller="flash"><%= flash[:alert] %></div>
       <% end %>
       <% if flash[:info].present? %>
-        <div class="flash flash--info flash--auto-dismiss" role="status" data-flash><%= flash[:info] %></div>
+        <div class="flash flash--info flash--auto-dismiss" role="status" data-controller="flash"><%= flash[:info] %></div>
       <% end %>
       <%= yield %>
     </main>
@@ -41,6 +41,6 @@
       </div>
     </footer>
   </div>
-  <%= javascript_include_tag "application" %>
+  <%= javascript_importmap_tags %>
 </body>
 </html>
