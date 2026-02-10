@@ -3,9 +3,11 @@
 # Fisco.io - Portal operadores: Padrón de sujetos
 # Listado, export JSON, import idempotente por subject_id (UUID)
 
+require_relative "../../event_store/repository"
+
 module Operadores
   class PadronSujetosController < ApplicationController
-    before_action :set_sujeto, only: [:show, :edit, :update, :desactivar, :domicilio, :domicilio_update, :corregir_fuerza_mayor, :corregir_fuerza_mayor_update]
+    before_action :set_sujeto, only: [:show, :edit, :update, :desactivar, :domicilio, :domicilio_update, :corregir_fuerza_mayor, :corregir_fuerza_mayor_update, :snapshot_at]
 
     PER_PAGE = 25
     MAX_PER_PAGE = 100
@@ -44,6 +46,7 @@ module Operadores
     end
 
     def show
+      @eventos = EventRecord.where(aggregate_id: @sujeto.subject_id, aggregate_type: "Identity::Subject").order(:event_version).to_a
     end
 
     def edit
@@ -77,10 +80,21 @@ module Operadores
     end
 
     def desactivar
-      Identity::Handlers::CeaseSubjectHandler.new.call(Identity::Commands::CeaseSubject.new(aggregate_id: @sujeto.subject_id))
+      cmd = Identity::Commands::CeaseSubject.new(
+        aggregate_id: @sujeto.subject_id,
+        observations: params[:observations].to_s.strip.presence
+      )
+      Identity::Handlers::CeaseSubjectHandler.new.call(cmd)
       redirect_to operadores_padron_sujetos_path, notice: "Sujeto cesado."
     rescue StandardError => e
       redirect_to operadores_padron_sujetos_path, alert: "Error al cesar: #{e.message}"
+    end
+
+    def snapshot_at
+      up_to = params[:up_to_version].presence&.to_i
+      repo = EventStore::Repository.new
+      @snapshot = repo.load_up_to_version(@sujeto.subject_id, Identity::Subject, up_to)
+      render partial: "operadores/padron_sujetos/snapshot_modal", layout: false, content_type: "text/html"
     end
 
     def domicilio

@@ -14,7 +14,8 @@ module Identity
         subject = @repository.load(cmd.aggregate_id, Identity::Subject)
         raise ArgumentError, "Subject not found: #{cmd.aggregate_id}" unless subject
 
-        event = Identity::Events::SubjectCeased.new(aggregate_id: cmd.aggregate_id)
+        data = cmd.observations.present? ? { "observations" => cmd.observations } : {}
+        event = Identity::Events::SubjectCeased.new(aggregate_id: cmd.aggregate_id, data: data)
         @repository.append(cmd.aggregate_id, Identity::Subject.name, event)
         @event_bus.publish(event)
         { subject_id: cmd.aggregate_id }

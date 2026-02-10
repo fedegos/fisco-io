@@ -61,6 +61,8 @@ class DropdownController extends Controller {
     const menu = this.menuTarget
     if (!summary) return
     const rect = summary.getBoundingClientRect()
+    menu.style.position = "fixed"
+    menu.style.visibility = "hidden"
     requestAnimationFrame(() => {
       const menuH = menu.offsetHeight
       const menuW = menu.offsetWidth

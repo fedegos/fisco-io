@@ -1,0 +1,33 @@
+<%= turbo_frame_tag "snapshot_modal", data: { controller: "snapshot-modal" } do %>
+  <div class="modal-overlay modal-overlay--snapshot" id="snapshot_modal_backdrop" role="dialog" aria-modal="true" aria-labelledby="snapshot_modal_title" data-action="click->snapshot-modal#close">
+    <div class="modal-content modal-content--detail" data-action="click->snapshot-modal#stopPropagation">
+      <header class="modal-header">
+        <h2 id="snapshot_modal_title" class="modal-title">Estado de la obligación hasta este evento (solo lectura)</h2>
+        <button type="button" class="modal-close" aria-label="Cerrar" data-action="click->snapshot-modal#close">×</button>
+      </header>
+      <div class="modal-body">
+        <% o = @snapshot %>
+        <section class="card card--spaced">
+          <h3 class="card__title card__title--sm">Datos principales</h3>
+          <dl class="dl-list">
+            <dt>ID obligación</dt>
+            <dd><code class="code--small"><%= o.obligation_id %></code></dd>
+            <dt>Sujeto principal</dt>
+            <dd><%= o.primary_subject_id %></dd>
+            <dt>Tipo</dt>
+            <dd><%= o.tax_type.presence || "—" %></dd>
+            <dt>Rol</dt>
+            <dd><%= o.role.presence || "—" %></dd>
+            <dt>Estado</dt>
+            <dd><%= o.status.presence || "—" %></dd>
+            <dt>Versión (evento)</dt>
+            <dd><%= o.version %></dd>
+          </dl>
+        </section>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn btn--secondary" data-action="click->snapshot-modal#close">Cerrar</button>
+      </footer>
+    </div>
+  </div>
+<% end %>

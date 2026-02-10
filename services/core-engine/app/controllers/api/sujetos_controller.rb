@@ -58,7 +58,10 @@ module Api
     end
 
     def cesar
-      cmd = Identity::Commands::CeaseSubject.new(aggregate_id: params[:id])
+      cmd = Identity::Commands::CeaseSubject.new(
+        aggregate_id: params[:id],
+        observations: params[:observations]
+      )
       Identity::Handlers::CeaseSubjectHandler.new.call(cmd)
       head :no_content
     rescue ArgumentError => e

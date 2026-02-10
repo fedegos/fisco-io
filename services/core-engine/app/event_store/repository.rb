@@ -31,10 +31,17 @@ module EventStore
     # Reconstruye el agregado cargando todos sus eventos por aggregate_id.
     # aggregate_class: clase del agregado (ej. Identity::Subject).
     def load(aggregate_id, aggregate_class)
-      records = EventRecord
+      load_up_to_version(aggregate_id, aggregate_class, nil)
+    end
+
+    # Reconstruye el agregado aplicando solo eventos con event_version <= up_to_version.
+    # up_to_version nil = todos. Útil para auditoría (snapshot en un punto del tiempo).
+    def load_up_to_version(aggregate_id, aggregate_class, up_to_version)
+      scope = EventRecord
         .where(aggregate_id: aggregate_id, aggregate_type: aggregate_class.name)
         .order(:event_version)
-        .to_a
+      scope = scope.where("event_version <= ?", up_to_version) if up_to_version.present?
+      records = scope.to_a
 
       return nil if records.empty?
 

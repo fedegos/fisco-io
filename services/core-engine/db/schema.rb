@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 13) do
+ActiveRecord::Schema[8.1].define(version: 14) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -100,6 +100,7 @@ ActiveRecord::Schema[8.1].define(version: 13) do
     t.string "address_line"
     t.string "address_locality"
     t.string "address_province"
+    t.text "cessation_observations"
     t.jsonb "contact_entries", default: []
     t.datetime "created_at", null: false
     t.uuid "digital_domicile_id"

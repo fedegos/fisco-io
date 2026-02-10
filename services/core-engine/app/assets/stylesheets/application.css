@@ -1,7 +1,13 @@
 /* Fisco.io - Design system: modular (Rails 8)
-   Orden: variables → base → layout → components
+   Orden: variables → base → layout → components (por tipo)
 */
 @import "variables";
 @import "base";
 @import "layout";
-@import "components";
+@import "components/buttons";
+@import "components/flash";
+@import "components/tables";
+@import "components/forms";
+@import "components/cards";
+@import "components/modals";
+@import "components/utilities";

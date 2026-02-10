@@ -1,6 +1,6 @@
 <% content_for :title, "Padrón de sujetos - Operadores - Fisco.io" %>
 
-<div class="page-container">
+<div class="page-container" data-controller="cesar-modal">
   <header class="page-header">
     <p class="page-subtitle"><%= link_to "Operadores", operadores_root_path %> → Padrones</p>
     <h1 class="page-title">Padrón de sujetos</h1>
@@ -61,7 +61,7 @@
                     <li><%= link_to "Corregir (fuerza mayor)", operadores_corregir_fuerza_mayor_padron_sujeto_path(s.subject_id), role: "menuitem", class: "actions-dropdown__link" %></li>
                     <% if s.status == "active" %>
                       <li>
-                        <%= button_to "Cesar", operadores_cesar_padron_sujeto_path(s.subject_id), method: :patch, form: { data: { controller: "confirm", confirm: "¿Cesar este sujeto?" } } %>
+                        <button type="button" class="actions-dropdown__link" data-action="click->cesar-modal#open" data-url="<%= operadores_cesar_padron_sujeto_path(s.subject_id) %>" data-subject-name="<%= s.legal_name %>">Cesar</button>
                       </li>
                     <% end %>
                   </ul>
@@ -80,4 +80,6 @@
   <% if @total_count && @total_count > 0 %>
     <%= render "shared/pagination", page: @page, per_page: @per_page, total_count: @total_count %>
   <% end %>
+
+  <%= render "cesar_modal", cesar_url: "", subject_name: "" %>
 </div>

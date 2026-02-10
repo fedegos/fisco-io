@@ -1,0 +1,30 @@
+/* Fisco.io - Mensajes flash */
+
+.flash {
+  padding: var(--space-md) var(--space-lg);
+  margin: 0 0 var(--space-lg);
+  border-radius: var(--radius-md);
+  border-left: 4px solid;
+}
+
+.flash--notice {
+  background: var(--color-notice-bg);
+  border-color: var(--color-notice-border);
+  color: #99f6e4;
+}
+
+.flash--alert {
+  background: var(--color-alert-bg);
+  border-color: var(--color-alert-border);
+  color: #fecaca;
+}
+
+.flash--info {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.flash--auto-dismiss {
+  cursor: pointer;
+}

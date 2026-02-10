@@ -1,0 +1,121 @@
+/* Fisco.io - Botones: base, primary (azul), secondary (gris), sm, submit sin clase */
+
+.btn,
+a.btn,
+button.btn,
+summary.btn,
+input.btn[type="submit"],
+input.btn[type="button"] {
+  display: inline-block;
+  padding: var(--space-sm) var(--space-lg);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  box-sizing: border-box;
+}
+
+a.btn {
+  border: 1px solid transparent;
+}
+
+summary.btn {
+  list-style: none;
+}
+
+/* Primary: azul (acción principal) */
+.btn--primary,
+a.btn--primary,
+button.btn--primary,
+summary.btn--primary,
+input.btn--primary[type="submit"] {
+  background: var(--color-primary);
+  color: var(--color-bg);
+}
+
+.btn--primary:hover,
+a.btn--primary:hover,
+button.btn--primary:hover,
+summary.btn--primary:hover,
+input.btn--primary[type="submit"]:hover {
+  background: var(--color-primary-hover);
+  color: var(--color-bg);
+}
+
+/* Secondary: gris (acción secundaria) */
+.btn--secondary,
+a.btn--secondary,
+button.btn--secondary,
+summary.btn--secondary,
+input.btn--secondary[type="submit"] {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.btn--secondary:hover,
+a.btn--secondary:hover,
+button.btn--secondary:hover,
+summary.btn--secondary:hover,
+input.btn--secondary[type="submit"]:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+/* Tamaño pequeño (tablas, listas) */
+.btn--sm,
+a.btn--sm,
+button.btn--sm,
+summary.btn--sm,
+input.btn--sm[type="submit"] {
+  padding: var(--space-xs) var(--space-md);
+  font-size: 0.875rem;
+}
+
+/* Submit/button sin clase .btn: mismo aspecto que secondary */
+.form-actions input[type="submit"]:not(.btn),
+.form-actions button[type="submit"]:not(.btn),
+.filters-bar input[type="submit"]:not(.btn),
+.filters-bar button[type="submit"]:not(.btn),
+.app-main input[type="submit"]:not(.btn),
+.app-main button[type="submit"]:not(.btn) {
+  display: inline-block;
+  padding: var(--space-sm) var(--space-lg);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.4;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  box-sizing: border-box;
+}
+
+.form-actions input[type="submit"]:not(.btn):hover,
+.form-actions button[type="submit"]:not(.btn):hover,
+.filters-bar input[type="submit"]:not(.btn):hover,
+.filters-bar button[type="submit"]:not(.btn):hover,
+.app-main input[type="submit"]:not(.btn):hover,
+.app-main button[type="submit"]:not(.btn):hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.page-actions {
+  margin-bottom: var(--space-lg);
+}
+
+.page-actions--wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}

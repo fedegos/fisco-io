@@ -42,6 +42,7 @@ Rails.application.routes.draw do
     get "padron/sujetos/:id/domicilio", to: "padron_sujetos#domicilio", as: :domicilio_padron_sujeto
     patch "padron/sujetos/:id/domicilio", to: "padron_sujetos#domicilio_update"
     patch "padron/sujetos/:id/cesar", to: "padron_sujetos#desactivar", as: :cesar_padron_sujeto
+    get "padron/sujetos/:id/snapshot_at", to: "padron_sujetos#snapshot_at", as: :snapshot_at_padron_sujeto
     get "padron/sujetos/:id/corregir_fuerza_mayor", to: "padron_sujetos#corregir_fuerza_mayor", as: :corregir_fuerza_mayor_padron_sujeto
     patch "padron/sujetos/:id/corregir_fuerza_mayor", to: "padron_sujetos#corregir_fuerza_mayor_update"
     patch "padron/sujetos/:id/desactivar", to: "padron_sujetos#desactivar", as: :desactivar_padron_sujeto
@@ -56,6 +57,7 @@ Rails.application.routes.draw do
     get "padron/objetos/:id/edit", to: "padron_objetos#edit", as: :edit_padron_objeto
     patch "padron/objetos/:id", to: "padron_objetos#update"
     patch "padron/objetos/:id/cerrar", to: "padron_objetos#cerrar", as: :cerrar_padron_objeto
+    get "padron/objetos/:id/snapshot_at", to: "padron_objetos#snapshot_at", as: :snapshot_at_padron_objeto
     get "padron/objetos/:id/corregir_fuerza_mayor", to: "padron_objetos#corregir_fuerza_mayor", as: :corregir_fuerza_mayor_padron_objeto
     patch "padron/objetos/:id/corregir_fuerza_mayor", to: "padron_objetos#corregir_fuerza_mayor_update"
     post "padron/objetos/:id/valuaciones", to: "padron_objetos#create_valuacion", as: :padron_objeto_valuaciones

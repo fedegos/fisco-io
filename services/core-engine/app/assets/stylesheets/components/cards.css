@@ -1,0 +1,79 @@
+/* Fisco.io - Cards, grids, listas en cards */
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  max-width: 100%;
+}
+
+.card-grid {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.card-grid--dashboard {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.card-grid > .card {
+  min-width: 0;
+}
+
+.card--event {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-lg);
+}
+
+.card--spaced {
+  margin-bottom: var(--space-lg);
+}
+
+.card__title {
+  margin: 0 0 var(--space-md);
+  font-size: 1.125rem;
+}
+
+.card__title--sm {
+  margin: 0 0 var(--space-sm);
+  font-size: 1rem;
+}
+
+.card__description {
+  margin: 0 0 var(--space-md);
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.card__description:last-of-type {
+  margin-bottom: var(--space-sm);
+}
+
+.card__actions {
+  margin: var(--space-md) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card__actions--sm {
+  margin: var(--space-sm) 0 0;
+  font-size: 0.875rem;
+}
+
+.card__actions--xs {
+  margin: var(--space-xs) 0 0;
+  font-size: 0.8125rem;
+}
+
+.card--event .meta-row {
+  margin-bottom: var(--space-sm);
+}
+
+.card--event .meta-row:last-child {
+  margin-bottom: 0;
+}

@@ -1,121 +1,89 @@
 # frozen_string_literal: true
 
 # Fisco.io - Subject projection
-# Proyección de sujetos (read model) / Subjects projection (read model)
+# Proyección de sujetos (read model) / Subject read model projection
 
 module Identity
   module Projections
     class SubjectProjection < BaseProjection
       def handle_SubjectRegistered(event)
-        apply_subject_enrolled(event.data)
+        apply_subject_created(event.data)
       end
 
       def handle_SubjectEnrolled(event)
-        apply_subject_enrolled(event.data)
-      end
-
-      def handle_SubjectUpdated(event)
-        apply_contact_data_updated(event)
-      end
-
-      def handle_SubjectContactDataUpdated(event)
-        apply_contact_data_updated(event)
-      end
-
-      def handle_SubjectDomicileChanged(event)
-        return unless SubjectReadModel.table_exists?
-
-        rec = SubjectReadModel.find_by(subject_id: event.aggregate_id)
-        return unless rec
-
-        data = event.data
-        attrs = { updated_at: Time.current }
-        attrs[:address_province] = data["address_province"] if data.key?("address_province") && rec.respond_to?(:address_province=)
-        attrs[:address_locality] = data["address_locality"] if data.key?("address_locality") && rec.respond_to?(:address_locality=)
-        attrs[:address_line] = data["address_line"] if data.key?("address_line") && rec.respond_to?(:address_line=)
-        attrs[:digital_domicile_id] = data["digital_domicile_id"] if data.key?("digital_domicile_id") && rec.respond_to?(:digital_domicile_id=)
-        rec.update!(attrs)
-      end
-
-      def handle_SubjectDeactivated(event)
-        apply_subject_ceased(event)
+        apply_subject_created(event.data)
       end
 
       def handle_SubjectCeased(event)
-        apply_subject_ceased(event)
+        return unless SubjectReadModel.table_exists?
+
+        record = SubjectReadModel.find_by(subject_id: event.aggregate_id)
+        return unless record
+
+        attrs = { status: "inactive" }
+        attrs[:cessation_observations] = event.data["observations"] if event.data.is_a?(Hash) && event.data["observations"].present? && record.respond_to?(:cessation_observations=)
+        record.update!(attrs)
+      end
+
+      def handle_SubjectUpdated(event)
+        apply_subject_updated(event.data, event.aggregate_id)
+      end
+
+      def handle_SubjectContactDataUpdated(event)
+        apply_subject_updated(event.data, event.aggregate_id)
+      end
+
+      def handle_SubjectDomicileChanged(event)
+        apply_subject_updated(event.data, event.aggregate_id)
       end
 
       def handle_SubjectCorrectedByForceMajeure(event)
-        return unless SubjectReadModel.table_exists?
-
-        rec = SubjectReadModel.find_by(subject_id: event.aggregate_id)
-        return unless rec
-
-        data = event.data
-        attrs = { updated_at: Time.current }
-        attrs[:legal_name] = data["legal_name"] if data.key?("legal_name")
-        attrs[:trade_name] = data["trade_name"] if data.key?("trade_name")
-        attrs[:address_province] = data["address_province"] if data.key?("address_province") && rec.respond_to?(:address_province=)
-        attrs[:address_locality] = data["address_locality"] if data.key?("address_locality") && rec.respond_to?(:address_locality=)
-        attrs[:address_line] = data["address_line"] if data.key?("address_line") && rec.respond_to?(:address_line=)
-        attrs[:digital_domicile_id] = data["digital_domicile_id"] if data.key?("digital_domicile_id") && rec.respond_to?(:digital_domicile_id=)
-        rec.update!(attrs) if attrs.size > 1
+        apply_subject_updated(event.data, event.aggregate_id)
       end
 
       private
 
-      def apply_subject_enrolled(data)
+      def apply_subject_created(data)
         return unless SubjectReadModel.table_exists?
+        return unless data.is_a?(Hash) && data["subject_id"].present?
 
-        attrs = {
+        record = SubjectReadModel.find_or_initialize_by(subject_id: data["subject_id"])
+        return if record.persisted?
+
+        record.assign_attributes(
           subject_id: data["subject_id"],
-          tax_id: data["tax_id"],
-          legal_name: data["legal_name"],
-          trade_name: data["trade_name"],
-          status: data["status"] || "active",
-          registration_date: data["registration_date"].is_a?(String) ? Date.parse(data["registration_date"]) : data["registration_date"],
-          created_at: Time.current,
-          updated_at: Time.current
-        }
-        attrs[:digital_domicile_id] = data["digital_domicile_id"] if data.key?("digital_domicile_id") && SubjectReadModel.column_names.include?("digital_domicile_id")
-        SubjectReadModel.upsert(attrs, unique_by: :subject_id)
+          tax_id: data["tax_id"].to_s,
+          legal_name: data["legal_name"].to_s,
+          trade_name: data["trade_name"].to_s.presence,
+          status: data["status"].presence || "active",
+          registration_date: parse_date(data["registration_date"])
+        )
+        record.save!
       end
 
-      def apply_contact_data_updated(event)
-        return unless SubjectReadModel.table_exists?
+      def apply_subject_updated(data, aggregate_id)
+        return unless SubjectReadModel.table_exists? && data.is_a?(Hash)
 
-        rec = SubjectReadModel.find_by(subject_id: event.aggregate_id)
-        return unless rec
+        record = SubjectReadModel.find_by(subject_id: aggregate_id)
+        return unless record
 
-        data = event.data
-        attrs = { updated_at: Time.current }
+        attrs = {}
         attrs[:legal_name] = data["legal_name"] if data.key?("legal_name")
         attrs[:trade_name] = data["trade_name"] if data.key?("trade_name")
-        attrs[:contact_entries] = data["contact_entries"] if data.key?("contact_entries") && rec.respond_to?(:contact_entries=)
-        rec.update!(attrs)
+        attrs[:address_province] = data["address_province"] if data.key?("address_province")
+        attrs[:address_locality] = data["address_locality"] if data.key?("address_locality")
+        attrs[:address_line] = data["address_line"] if data.key?("address_line")
+        attrs[:digital_domicile_id] = data["digital_domicile_id"] if data.key?("digital_domicile_id")
+        attrs[:contact_entries] = data["contact_entries"] if data.key?("contact_entries")
+        record.update!(attrs) if attrs.any?
       end
 
-      def apply_subject_ceased(event)
-        return unless SubjectReadModel.table_exists?
-
-        rec = SubjectReadModel.find_by(subject_id: event.aggregate_id)
-        return unless rec
-
-        rec.update!(status: "inactive", updated_at: Time.current)
-      end
-
-      public
-
-      def handle_RepresentativeAuthorized(_event)
-        # TODO: actualizar read model (representantes)
-      end
-
-      def handle_RepresentativeRevoked(_event)
-        # TODO: actualizar read model (representantes)
-      end
-
-      def handle_SubjectSegmentChanged(_event)
-        # TODO: actualizar read model (segmentos)
+      def parse_date(value)
+        return nil if value.blank?
+        return value if value.is_a?(Date)
+        Date.parse(value.to_s)
+      rescue ArgumentError
+        nil
       end
     end
   end

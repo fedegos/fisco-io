@@ -1,0 +1,291 @@
+/* Fisco.io - Utilidades: listas, badge, dl, paginacion, detalles, grilla tramos */
+
+.page-intro {
+  margin-bottom: var(--space-xl);
+  color: var(--color-text-muted);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.text-small {
+  font-size: 0.875rem;
+}
+
+.text-tiny {
+  font-size: 0.8125rem;
+}
+
+.balance-amount {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.id-internal {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+/* Listas */
+.list-unstyled {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.list-unstyled--bullets {
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.list-unstyled .list-item {
+  margin-bottom: var(--space-sm);
+}
+
+.list-unstyled .list-item:last-child {
+  margin-bottom: 0;
+}
+
+.list-item {
+  margin-bottom: var(--space-xs);
+}
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+  margin-bottom: var(--space-sm);
+}
+
+.meta-row:last-child {
+  margin-bottom: 0;
+}
+
+.meta-line {
+  margin: 0 0 var(--space-sm);
+}
+
+.meta-line:last-child {
+  margin-bottom: 0;
+}
+
+/* Badge */
+.badge {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-hover);
+  color: var(--color-primary);
+}
+
+.badge--muted {
+  color: var(--color-text-muted);
+}
+
+.badge--success {
+  color: var(--color-accent);
+}
+
+/* Dl list */
+.dl-list {
+  margin: 0;
+}
+
+.dl-list dt {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-top: var(--space-sm);
+}
+
+.dl-list dt:first-child {
+  margin-top: 0;
+}
+
+.dl-list dd {
+  margin: var(--space-xs) 0 0;
+}
+
+/* Paginacion */
+.pagination {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.pagination__summary {
+  margin: 0 0 var(--space-sm);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.pagination__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pagination__link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.pagination__link:hover {
+  text-decoration: underline;
+}
+
+.pagination__current {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+/* Contact list, address */
+.address-block {
+  margin: 0;
+}
+
+.contact-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: none;
+}
+
+.contact-list li {
+  margin-bottom: var(--space-xs);
+}
+
+/* Event list (auditoria) */
+.event-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.event-list__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.event-list__meta {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+/* Codigo */
+.code--small {
+  font-size: 0.75rem;
+}
+
+.code--xs {
+  font-size: 0.8rem;
+}
+
+/* Details block (JSON, etc.) */
+.details-block {
+  margin-top: var(--space-sm);
+}
+
+.details-block summary {
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.details-block pre {
+  margin: var(--space-sm) 0 0;
+  padding: var(--space-md);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  overflow-x: auto;
+}
+
+/* Grilla tramos (inmobiliario) */
+.brackets-form__row--destroy {
+  opacity: 0.5;
+  background: var(--color-surface-hover);
+}
+
+.brackets-form__tramo-final {
+  display: block;
+  margin-bottom: var(--space-xs);
+}
+
+.brackets-form__tramo-final--inline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: 0;
+  margin-right: var(--space-sm);
+}
+
+.valuacion-table {
+  margin-top: var(--space-md);
+}
+
+/* Responsive */
+@media (max-width: 48rem) {
+  .app-nav {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: var(--nav-height);
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .app-nav__links {
+    width: 100%;
+    justify-content: flex-start;
+    order: 3;
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .app-main {
+    padding: var(--space-md);
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .table th,
+  .table td {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.875rem;
+  }
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+a:focus-visible,
+.app-nav__link:focus-visible,
+button:focus-visible,
+input[type="submit"]:focus-visible,
+input[type="button"]:focus-visible,
+.btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

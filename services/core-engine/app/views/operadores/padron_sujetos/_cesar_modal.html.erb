@@ -1,0 +1,24 @@
+<% cesar_url = local_assigns[:cesar_url].to_s %>
+<% subject_name = local_assigns[:subject_name].to_s.presence || "este sujeto" %>
+
+<div class="modal-overlay modal-overlay--cesar is-hidden" data-cesar-modal-target="overlay" aria-hidden="true" data-action="click->cesar-modal#close">
+  <div class="modal-content" data-action="click->cesar-modal#stopPropagation" data-cesar-modal-target="content">
+    <header class="modal-header">
+      <h2 id="cesar_modal_title" class="modal-title" data-cesar-modal-target="title">Confirmar cese de <%= subject_name %></h2>
+      <button type="button" class="modal-close" aria-label="Cerrar" data-action="click->cesar-modal#close">×</button>
+    </header>
+    <%= form_with url: cesar_url.presence || "#", method: :patch, local: true, data: { cesar_modal_target: "form" }, html: { id: "cesar_confirm_form" } do |f| %>
+      <div class="modal-body">
+        <p class="form-field__hint">El cese desactivará al sujeto. Opcionalmente registre las observaciones de la baja.</p>
+        <div class="form-field">
+          <label for="cesar_observations" class="form-field__label">Observaciones de la baja</label>
+          <textarea name="observations" id="cesar_observations" class="form-input form-input--textarea" rows="4" placeholder="Ej. Baja solicitada por el contribuyente..."></textarea>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn btn--secondary" data-action="click->cesar-modal#close">Cancelar</button>
+        <%= f.submit "Confirmar cese", class: "btn btn--primary" %>
+      </footer>
+    <% end %>
+  </div>
+</div>

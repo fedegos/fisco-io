@@ -1,0 +1,135 @@
+/* Fisco.io - Formularios: campos, inputs, barra de filtros */
+
+.form-field {
+  margin-bottom: var(--space-md);
+}
+
+.form-field:last-of-type {
+  margin-bottom: 0;
+}
+
+.form-field__label {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.form-field__hint {
+  margin: var(--space-xs) 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.form-field--hint {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-top: var(--space-sm);
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  align-items: center;
+  margin-top: var(--space-lg);
+}
+
+.form-input {
+  width: 100%;
+  min-width: 8rem;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+}
+
+.form-input--number {
+  min-width: 6rem;
+}
+
+.form-input--year {
+  min-width: 6.5rem;
+}
+
+.form-input--textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.form-input--narrow {
+  max-width: 4rem;
+}
+
+.form-input--checkbox {
+  width: auto;
+  min-width: 1.25rem;
+  height: 1.25rem;
+}
+
+.filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  align-items: flex-end;
+  margin-bottom: var(--space-xl);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.filters-bar label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.filters-bar input:not([type="submit"]):not([type="checkbox"]):not([type="radio"]),
+.filters-bar select {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  min-width: 10rem;
+}
+
+.filters-bar input[type="number"] {
+  min-width: 6rem;
+}
+
+.filters-bar input[type="date"] {
+  min-width: 10rem;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.form-row--gap {
+  gap: var(--space-md);
+}
+
+.form-row .form-field {
+  margin-bottom: 0;
+}
+
+.valuacion-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  align-items: flex-end;
+}
+
+.valuacion-form-row .form-field {
+  margin-bottom: 0;
+}

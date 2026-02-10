@@ -3,9 +3,11 @@
 # Fisco.io - Portal operadores: Padrón de objetos (obligaciones)
 # Listado, export JSON, import idempotente por obligation_id (UUID)
 
+require_relative "../../event_store/repository"
+
 module Operadores
   class PadronObjetosController < ApplicationController
-    before_action :set_obligacion, only: [:show, :edit, :update, :cerrar, :create_valuacion, :update_valuacion, :corregir_fuerza_mayor, :corregir_fuerza_mayor_update]
+    before_action :set_obligacion, only: [:show, :edit, :update, :cerrar, :create_valuacion, :update_valuacion, :corregir_fuerza_mayor, :corregir_fuerza_mayor_update, :snapshot_at]
 
     PER_PAGE = 25
     MAX_PER_PAGE = 100
@@ -49,6 +51,14 @@ module Operadores
 
     def show
       @valuaciones = FiscalValuation.where(obligation_id: @obligacion.obligation_id).order(year: :desc)
+      @eventos = EventRecord.where(aggregate_id: @obligacion.obligation_id, aggregate_type: "Obligations::TaxObligation").order(:event_version).to_a
+    end
+
+    def snapshot_at
+      up_to = params[:up_to_version].presence&.to_i
+      repo = EventStore::Repository.new
+      @snapshot = repo.load_up_to_version(@obligacion.obligation_id, Obligations::TaxObligation, up_to)
+      render partial: "operadores/padron_objetos/snapshot_modal", layout: false, content_type: "text/html"
     end
 
     def edit

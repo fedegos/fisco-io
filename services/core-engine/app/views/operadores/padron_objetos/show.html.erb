@@ -1,5 +1,5 @@
 <% content_for :title, "Objeto #{@obligacion.display_id} - Operadores - Fisco.io" %>
-<div class="page-container">
+<div class="page-container" data-controller="snapshot-modal">
   <header class="page-header">
     <p class="page-subtitle"><%= link_to "Padrón de objetos", operadores_padron_objetos_path %> → Detalle</p>
     <h1 class="page-title">Objeto <%= @obligacion.display_id %></h1>
@@ -73,4 +73,24 @@
       </table>
     </div>
   </section>
+
+  <% if @eventos.present? %>
+  <section class="card card--spaced">
+    <h2 class="card__title card__title--sm">Auditoría (eventos)</h2>
+    <ul class="event-list">
+      <% @eventos.each do |ev| %>
+        <li class="event-list__item">
+          <span class="badge badge--muted">v<%= ev.event_version %></span>
+          <strong><%= ev.event_type %></strong>
+          <span class="event-list__meta"><%= ev.created_at.to_fs(:short) %></span>
+          <%= link_to "Ver estado hasta aquí", operadores_snapshot_at_padron_objeto_path(@obligacion.obligation_id, up_to_version: ev.event_version), class: "btn btn--secondary btn--sm", data: { turbo_frame: "snapshot_modal" } %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+  <% end %>
+
+  <div data-controller="snapshot-modal">
+    <%= turbo_frame_tag "snapshot_modal" %>
+  </div>
 </div>

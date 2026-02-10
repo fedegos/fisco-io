@@ -3,10 +3,19 @@
   <h1 class="page-title">Nueva configuración (año)</h1>
   <div class="card">
     <%= form_with model: @config, url: operadores_configuracion_inmobiliario_path, method: :post do |f| %>
-      <%= f.label :year, "Año" %> <%= f.number_field :year, min: 2000 %>
-      <%= f.label :formula_base_expression, "Expresión fórmula base" %> <%= f.text_field :formula_base_expression %>
-      <%= f.label :installments_per_year, "Cuotas por año" %> <%= f.number_field :installments_per_year, min: 1, max: 12 %>
-      <%= f.submit "Crear" %>
+      <div class="form-field">
+        <%= f.label :year, "Año" %>
+        <%= f.number_field :year, min: 2000, class: "form-input form-input--year" %>
+      </div>
+      <div class="form-field">
+        <%= f.label :formula_base_expression, "Expresión fórmula base" %>
+        <%= f.text_field :formula_base_expression, class: "form-input" %>
+      </div>
+      <div class="form-field">
+        <%= f.label :installments_per_year, "Cuotas por año" %>
+        <%= f.number_field :installments_per_year, min: 1, max: 12, class: "form-input form-input--number" %>
+      </div>
+      <%= f.submit "Crear", class: "btn btn--primary" %>
     <% end %>
   </div>
 </div>
