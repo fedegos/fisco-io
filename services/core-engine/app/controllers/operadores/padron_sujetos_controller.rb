@@ -2,8 +2,7 @@
 
 # Fisco.io - Portal operadores: Padrón de sujetos
 # Listado, export JSON, import idempotente por subject_id (UUID)
-
-require_relative "../../event_store/repository"
+# EventStore::Repository se carga en config/initializers/event_store.rb
 
 module Operadores
   class PadronSujetosController < ApplicationController
@@ -37,7 +36,7 @@ module Operadores
         render :new, status: :unprocessable_entity
         return
       end
-      result = Identity::Handlers::EnrollSubjectHandler.new.call(cmd)
+      Identity::Handlers::EnrollSubjectHandler.new.call(cmd)
       redirect_to operadores_padron_sujetos_path, notice: "Sujeto creado correctamente."
     rescue StandardError => e
       @sujeto = SubjectReadModel.new(**(params[:subject_read_model]&.permit(:tax_id, :legal_name, :trade_name)&.to_h || {}).symbolize_keys)

@@ -2,8 +2,7 @@
 
 # Fisco.io - Portal operadores: Padrón de objetos (obligaciones)
 # Listado, export JSON, import idempotente por obligation_id (UUID)
-
-require_relative "../../event_store/repository"
+# EventStore::Repository se carga en config/initializers/event_store.rb
 
 module Operadores
   class PadronObjetosController < ApplicationController

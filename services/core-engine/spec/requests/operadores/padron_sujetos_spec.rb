@@ -64,7 +64,7 @@ RSpec.describe "Operadores / Padrón sujetos", type: :request do
         }
       }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include("Razón social y CUIT/CUIL son obligatorios.")
     end
 
@@ -105,7 +105,7 @@ RSpec.describe "Operadores / Padrón sujetos", type: :request do
         }
       }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include("Razón social es obligatoria.")
     end
 

@@ -5,13 +5,21 @@
 
 require "spec_helper"
 
+# Filtrar warnings de redefinición de métodos en gemas (vendor), no del código propio
+module SuppressVendorMethodRedefined
+  def warn(message, category: nil, **kwargs)
+    if message.include?("vendor") && (message.include?("method redefined") || message.include?("previous definition"))
+      return
+    end
+    super
+  end
+end
+Warning.extend(SuppressVendorMethodRedefined)
+
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 
-# Cargar event store explícitamente (Zeitwerk en test puede no autoloadear bajo app/event_store)
-require_relative "../app/event_store/repository"
-require_relative "../app/event_store/event_bus"
-require_relative "../app/event_store/rehydrated_event"
+# Event store y módulos se cargan vía initializer + Zeitwerk. No require_relative aquí.
 
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 

@@ -40,8 +40,7 @@ module Obligations
       apply_obligation_opened_data(event.data)
     end
 
-    def apply_TaxObligationUpdated(event)
-      d = event.data
+    def apply_TaxObligationUpdated(_event)
       # Only external_id is projected; aggregate could hold more if needed
     end
 
@@ -57,8 +56,7 @@ module Obligations
       # No state change on aggregate; projection updates FiscalValuation
     end
 
-    def apply_ObligationCorrectedByForceMajeure(event)
-      d = event.data
+    def apply_ObligationCorrectedByForceMajeure(_event)
       # Only external_id is projected; aggregate could hold more if needed
     end
 
