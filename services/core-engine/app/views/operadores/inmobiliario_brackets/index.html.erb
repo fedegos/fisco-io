@@ -8,6 +8,9 @@
     <%= link_to "Volver a configuración", operadores_inmobiliario_configs_path, class: "btn btn--secondary" %>
   </p>
   <%= form_with url: operadores_inmobiliario_brackets_path(@year), method: :patch, local: true, class: "brackets-form", data: { controller: "brackets-form", brackets_form_start_index_value: @brackets.size } do %>
+    <div class="brackets-form__toolbar">
+      <button type="button" class="btn btn--secondary" data-action="click->brackets-form#addRow">Agregar tramo</button>
+    </div>
     <div class="table-wrapper">
       <table class="table table--editable">
         <thead>
@@ -28,19 +31,22 @@
                 <%= hidden_field_tag "brackets[brackets_attributes][#{idx}][id]", b.id %>
               </td>
               <td>
-                <% if b.base_to.nil? %>
-                  <label class="brackets-form__tramo-final brackets-form__tramo-final--inline">
-                    <%= check_box_tag "brackets[brackets_attributes][#{idx}][tramo_final]", "1", true, class: "form-input form-input--checkbox", "data-action": "change->brackets-form#toggleTramoFinal", "aria-label": "Tramo final (hasta ∞)" %>
-                    Tramo final (hasta ∞)
-                  </label>
-                  <%= hidden_field_tag "brackets[brackets_attributes][#{idx}][base_to]", "" %>
-                <% else %>
-                  <label class="brackets-form__tramo-final brackets-form__tramo-final--inline">
-                    <%= check_box_tag "brackets[brackets_attributes][#{idx}][tramo_final]", "1", false, class: "form-input form-input--checkbox", "data-action": "change->brackets-form#toggleTramoFinal", "aria-label": "Tramo final (hasta ∞)" %>
+                <div class="brackets-form__base-to-row">
+                  <span class="brackets-form__base-to-value">
+                    <% if b.base_to.nil? %>
+                      <span class="brackets-form__infinity" aria-hidden="true">∞</span>
+                      <%= hidden_field_tag "brackets[brackets_attributes][#{idx}][base_to]", "" %>
+                      <%= number_field_tag "brackets[brackets_attributes][#{idx}][base_to]", nil, min: 0, step: 0.01, class: "form-input form-input--number", style: "display: none;" %>
+                    <% else %>
+                      <span class="brackets-form__infinity brackets-form__infinity--hidden" aria-hidden="true">∞</span>
+                      <%= number_field_tag "brackets[brackets_attributes][#{idx}][base_to]", b.base_to, min: 0, step: 0.01, class: "form-input form-input--number" %>
+                    <% end %>
+                  </span>
+                  <label class="brackets-form__tramo-final-label">
+                    <%= check_box_tag "brackets[brackets_attributes][#{idx}][tramo_final]", "1", b.base_to.nil?, class: "form-input form-input--checkbox", "data-action": "change->brackets-form#toggleTramoFinal", "aria-label": "Tramo final (hasta ∞)" %>
                     Tramo final
                   </label>
-                  <%= number_field_tag "brackets[brackets_attributes][#{idx}][base_to]", b.base_to, min: 0, step: 0.01, class: "form-input form-input--number" %>
-                <% end %>
+                </div>
               </td>
               <td>
                 <%= number_field_tag "brackets[brackets_attributes][#{idx}][rate_pct]", b.rate_pct, step: 0.0001, class: "form-input form-input--number" %>
@@ -63,11 +69,16 @@
               <%= number_field_tag "brackets[brackets_attributes][#{new_idx}][base_from]", nil, min: 0, step: 0.01, class: "form-input form-input--number", placeholder: "Nuevo" %>
             </td>
             <td>
-              <label class="brackets-form__tramo-final brackets-form__tramo-final--inline">
-                <input type="checkbox" name="brackets[brackets_attributes][<%= new_idx %>][tramo_final]" value="1" class="form-input form-input--checkbox" data-action="change->brackets-form#toggleTramoFinal" aria-label="Tramo final (hasta ∞)">
-                Tramo final
-              </label>
-              <%= number_field_tag "brackets[brackets_attributes][#{new_idx}][base_to]", nil, min: 0, step: 0.01, class: "form-input form-input--number", placeholder: "—" %>
+              <div class="brackets-form__base-to-row">
+                <span class="brackets-form__base-to-value">
+                  <span class="brackets-form__infinity brackets-form__infinity--hidden" aria-hidden="true">∞</span>
+                  <%= number_field_tag "brackets[brackets_attributes][#{new_idx}][base_to]", nil, min: 0, step: 0.01, class: "form-input form-input--number", placeholder: "—" %>
+                </span>
+                <label class="brackets-form__tramo-final-label">
+                  <input type="checkbox" name="brackets[brackets_attributes][<%= new_idx %>][tramo_final]" value="1" class="form-input form-input--checkbox" data-action="change->brackets-form#toggleTramoFinal" aria-label="Tramo final (hasta ∞)">
+                  Tramo final
+                </label>
+              </div>
             </td>
             <td>
               <%= number_field_tag "brackets[brackets_attributes][#{new_idx}][rate_pct]", nil, step: 0.0001, class: "form-input form-input--number", placeholder: "—" %>
@@ -89,7 +100,6 @@
       <strong>Rango:</strong> cada tramo aplica a valores <em>desde</em> (estrictamente mayor que) la base desde, <em>hasta</em> (menor o igual que) la base hasta. El último tramo puede ser "Tramo final (hasta ∞)".
     </p>
     <div class="form-actions">
-      <button type="button" class="btn btn--secondary" data-action="click->brackets-form#addRow">Agregar tramo</button>
       <%= submit_tag "Guardar cambios", class: "btn btn--primary" %>
       <%= link_to "Cancelar", operadores_inmobiliario_configs_path, class: "btn btn--secondary" %>
     </div>

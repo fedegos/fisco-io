@@ -94,7 +94,11 @@ module Operadores
       up_to = params[:up_to_version].presence&.to_i
       repo = EventStore::Repository.new
       @snapshot = repo.load_up_to_version(@sujeto.subject_id, Identity::Subject, up_to)
-      render partial: "operadores/padron_sujetos/snapshot_modal", layout: false, content_type: "text/html"
+      if @snapshot.nil?
+        render partial: "operadores/padron_sujetos/snapshot_modal_empty", layout: false, content_type: "text/html"
+      else
+        render partial: "operadores/padron_sujetos/snapshot_modal", layout: false, content_type: "text/html"
+      end
     end
 
     def domicilio

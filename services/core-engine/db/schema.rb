@@ -76,7 +76,7 @@ ActiveRecord::Schema[8.1].define(version: 14) do
 
   create_table "inmobiliario_rate_brackets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.decimal "base_from", precision: 15, scale: 2, default: "0.0", null: false
-    t.decimal "base_to", precision: 15, scale: 2, null: false
+    t.decimal "base_to", precision: 15, scale: 2
     t.datetime "created_at", null: false
     t.decimal "minimum_amount", precision: 15, scale: 2, default: "0.0", null: false
     t.integer "position", default: 0, null: false
@@ -100,7 +100,6 @@ ActiveRecord::Schema[8.1].define(version: 14) do
     t.string "address_line"
     t.string "address_locality"
     t.string "address_province"
-    t.text "cessation_observations"
     t.jsonb "contact_entries", default: []
     t.datetime "created_at", null: false
     t.uuid "digital_domicile_id"

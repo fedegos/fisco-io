@@ -1,7 +1,21 @@
 # frozen_string_literal: true
 
 # Fisco.io - RSpec configuration
-# Configuración mínima para specs / Minimal spec configuration
+# SimpleCov debe cargarse antes que cualquier código de la aplicación (si está instalado)
+begin
+  require "simplecov"
+  SimpleCov.start "rails" do
+    add_filter "/spec/"
+    add_filter "/config/"
+    add_filter "/bin/"
+    add_filter "/db/"
+    add_filter "/vendor/"
+    coverage_dir "coverage"
+    minimum_coverage 0
+  end
+rescue LoadError
+  # simplecov no instalado: bundle install en grupo test
+end
 
 APP_ROOT = File.expand_path("..", __dir__)
 $LOAD_PATH.unshift(APP_ROOT) unless $LOAD_PATH.include?(APP_ROOT)

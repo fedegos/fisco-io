@@ -64,4 +64,33 @@ RSpec.describe EventStore::Repository do
       expect(loaded).to be_nil
     end
   end
+
+  describe "#load_up_to_version" do
+    it "retorna nil si no hay eventos para el aggregate_id" do
+      loaded = repository.load_up_to_version(SecureRandom.uuid, Obligations::TaxObligation, 1)
+      expect(loaded).to be_nil
+    end
+
+    it "reconstruye el agregado solo hasta la versión indicada" do
+      aggregate_id = SecureRandom.uuid
+      subject_id = SecureRandom.uuid
+      event1 = Obligations::Events::ObligationOpened.new(
+        aggregate_id: aggregate_id,
+        data: {
+          "obligation_id" => aggregate_id,
+          "primary_subject_id" => subject_id,
+          "tax_type" => "inmobiliario",
+          "role" => "contribuyente",
+          "status" => "open",
+          "opened_at" => Date.current.to_s
+        }
+      )
+      repository.append(aggregate_id, Obligations::TaxObligation.name, event1)
+
+      loaded = repository.load_up_to_version(aggregate_id, Obligations::TaxObligation, 1)
+      expect(loaded).not_to be_nil
+      expect(loaded.obligation_id).to eq(aggregate_id)
+      expect(loaded.version).to eq(1)
+    end
+  end
 end

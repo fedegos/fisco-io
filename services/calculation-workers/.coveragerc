@@ -1,0 +1,17 @@
+# Fisco.io - Calculation Workers
+# Cobertura solo sobre src/; excluir tests y puntos de entrada mínimos
+
+[run]
+source = src
+omit =
+    tests/*
+    */__main__.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise NotImplementedError
+
+[html]
+directory = htmlcov

@@ -57,6 +57,18 @@ jobs:
       - name: Run RSpec
         working-directory: services/core-engine
         run: bundle exec rspec --format documentation || true
+      - name: Set up Node (JS tests)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: services/core-engine/package.json
+      - name: Install JS dependencies
+        working-directory: services/core-engine
+        run: npm ci || npm install
+      - name: Run Vitest (JS)
+        working-directory: services/core-engine
+        run: npm run test || true
 
   calculation-workers:
     name: Calculation Workers (Python)
@@ -75,9 +87,16 @@ jobs:
       - name: Lint (ruff)
         working-directory: services/calculation-workers
         run: pip install ruff && ruff check src/ || true
-      - name: Run pytest
+      - name: Run pytest with coverage
         working-directory: services/calculation-workers
-        run: pytest -v || true
+        run: pytest
+      - name: Upload coverage report (HTML)
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: calculation-workers-coverage
+          path: services/calculation-workers/htmlcov/
+          retention-days: 7
 
   asyncapi:
     name: AsyncAPI spec validation

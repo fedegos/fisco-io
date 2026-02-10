@@ -23,7 +23,9 @@ coverage/
 /public/assets
 /public/packs
 /public/packs-test
+# Node / JS (ignorar node_modules en cualquier subcarpeta)
 /node_modules
+node_modules/
 /yarn-error.log
 yarn-debug.log*
 .yarn-integrity

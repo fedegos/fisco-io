@@ -11,9 +11,9 @@
           <h3 class="card__title card__title--sm">Datos principales</h3>
           <dl class="dl-list">
             <dt>ID obligación</dt>
-            <dd><code class="code--small"><%= o.obligation_id %></code></dd>
+            <dd><code class="code--small"><%= o.obligation_id.presence || o.id %></code></dd>
             <dt>Sujeto principal</dt>
-            <dd><%= o.primary_subject_id %></dd>
+            <dd><%= o.primary_subject_id.presence || "—" %></dd>
             <dt>Tipo</dt>
             <dd><%= o.tax_type.presence || "—" %></dd>
             <dt>Rol</dt>
@@ -21,7 +21,7 @@
             <dt>Estado</dt>
             <dd><%= o.status.presence || "—" %></dd>
             <dt>Versión (evento)</dt>
-            <dd><%= o.version %></dd>
+            <dd><%= o.respond_to?(:version) ? o.version : "—" %></dd>
           </dl>
         </section>
       </div>

@@ -8,6 +8,7 @@ input.btn[type="submit"],
 input.btn[type="button"] {
   display: inline-block;
   padding: var(--space-sm) var(--space-lg);
+  min-height: 2.75rem;
   font-family: var(--font-sans);
   font-size: 0.9375rem;
   font-weight: 600;
@@ -68,13 +69,14 @@ input.btn--secondary[type="submit"]:hover {
   color: var(--color-text);
 }
 
-/* Tamaño pequeño (tablas, listas) */
+/* Tamaño pequeño (tablas, listas); mantiene área táctil mínima */
 .btn--sm,
 a.btn--sm,
 button.btn--sm,
 summary.btn--sm,
 input.btn--sm[type="submit"] {
   padding: var(--space-xs) var(--space-md);
+  min-height: 2.75rem;
   font-size: 0.875rem;
 }
 

@@ -1,0 +1,16 @@
+<%= turbo_frame_tag "snapshot_modal", data: { controller: "snapshot-modal" } do %>
+  <div class="modal-overlay modal-overlay--snapshot" role="dialog" aria-modal="true" aria-labelledby="snapshot_modal_title" data-action="click->snapshot-modal#close">
+    <div class="modal-content modal-content--detail" data-action="click->snapshot-modal#stopPropagation">
+      <header class="modal-header">
+        <h2 id="snapshot_modal_title" class="modal-title">Estado hasta este evento</h2>
+        <button type="button" class="modal-close" aria-label="Cerrar" data-action="click->snapshot-modal#close">×</button>
+      </header>
+      <div class="modal-body">
+        <p class="form-field__hint">No hay datos hasta este evento para esta obligación.</p>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn btn--secondary" data-action="click->snapshot-modal#close">Cerrar</button>
+      </footer>
+    </div>
+  </div>
+<% end %>

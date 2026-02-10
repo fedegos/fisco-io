@@ -58,36 +58,35 @@ export default class extends Controller {
   toggleTramoFinal(event) {
     const tr = event.target.closest("tr")
     if (!tr) return
-    const baseToInput = tr.querySelector('input[name*="[base_to]"]:not([type=hidden])')
-    const hidden = tr.querySelector('input[type=hidden][name*="[base_to]"]')
+    const cell = tr.querySelector(".brackets-form__base-to-value")
+    if (!cell) return
+    const baseToInput = cell.querySelector('input[type="number"][name*="[base_to]"]')
+    const hidden = cell.querySelector('input[type=hidden][name*="[base_to]"]')
+    const infinitySpan = cell.querySelector(".brackets-form__infinity")
     const tramoFinalCb = event.target
     const name = hidden ? hidden.getAttribute("name") : (baseToInput && baseToInput.getAttribute("name"))
     if (!name) return
     if (tramoFinalCb.checked) {
       if (baseToInput) {
+        baseToInput.style.display = "none"
         baseToInput.disabled = true
-        const h = document.createElement("input")
-        h.type = "hidden"
-        h.name = name
-        h.value = ""
-        baseToInput.parentNode.appendChild(h)
+        if (!hidden) {
+          const h = document.createElement("input")
+          h.type = "hidden"
+          h.name = name
+          h.value = ""
+          cell.appendChild(h)
+        }
       }
+      if (infinitySpan) infinitySpan.classList.remove("brackets-form__infinity--hidden")
     } else {
       if (baseToInput) {
+        baseToInput.style.display = ""
         baseToInput.disabled = false
-        const h = tr.querySelector(`input[type=hidden][name="${name}"]`)
+        const h = cell.querySelector('input[type=hidden][name*="[base_to]"]')
         if (h) h.remove()
-      } else if (hidden) {
-        const input = document.createElement("input")
-        input.type = "number"
-        input.name = hidden.getAttribute("name")
-        input.min = "0"
-        input.step = "0.01"
-        input.placeholder = "—"
-        input.className = "form-input form-input--number"
-        hidden.parentNode.appendChild(input)
-        hidden.remove()
       }
+      if (infinitySpan) infinitySpan.classList.add("brackets-form__infinity--hidden")
     }
   }
 }

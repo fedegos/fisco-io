@@ -215,22 +215,55 @@
 }
 
 /* Grilla tramos (inmobiliario) */
+.brackets-form__toolbar {
+  margin-bottom: var(--space-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
 .brackets-form__row--destroy {
   opacity: 0.5;
   background: var(--color-surface-hover);
 }
 
-.brackets-form__tramo-final {
-  display: block;
-  margin-bottom: var(--space-xs);
-}
-
-.brackets-form__tramo-final--inline {
-  display: inline-flex;
+.brackets-form__base-to-row {
+  display: flex;
   align-items: center;
   gap: var(--space-sm);
-  margin-bottom: 0;
-  margin-right: var(--space-sm);
+  flex-wrap: nowrap;
+}
+
+.brackets-form__base-to-value {
+  display: inline-flex;
+  align-items: center;
+  min-width: 8rem;
+}
+
+.brackets-form__base-to-value .form-input.form-input--number {
+  width: 100%;
+  min-width: 6rem;
+}
+
+.brackets-form__infinity {
+  font-size: 1.125rem;
+  color: var(--color-text-muted);
+  min-width: 2rem;
+}
+
+.brackets-form__infinity--hidden {
+  display: none;
+}
+
+.brackets-form__tramo-final-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  white-space: nowrap;
+  font-size: 0.875rem;
+  margin: 0;
+  cursor: pointer;
 }
 
 .valuacion-table {
@@ -260,6 +293,18 @@
 
   .page-title {
     font-size: 1.5rem;
+  }
+
+  .page-actions,
+  .form-actions,
+  .brackets-form__toolbar {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .table th,

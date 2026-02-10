@@ -8,7 +8,7 @@ COMPOSE = docker compose
 CORE = $(COMPOSE) run --rm core-engine
 WORKERS = $(COMPOSE) run --rm calculation-workers
 
-.PHONY: help up down build build-no-cache build-core-engine build-core-engine-no-cache restart restart-postgres restart-redis restart-redpanda restart-core-engine restart-calculation-workers logs logs-postgres logs-redis logs-redpanda logs-core-engine logs-calculation-workers bundle migrate seed seed-replant console routes test-db test-core test-workers test lint-core lint-workers lint validate-asyncapi validate-openapi pip-install
+.PHONY: help up down build build-no-cache build-core-engine build-core-engine-no-cache restart restart-postgres restart-redis restart-redpanda restart-core-engine restart-calculation-workers logs logs-postgres logs-redis logs-redpanda logs-core-engine logs-calculation-workers bundle migrate seed seed-replant console routes test-db test-core test-workers test-js test lint-core lint-workers lint validate-asyncapi validate-openapi pip-install
 
 .DEFAULT_GOAL := help
 
@@ -97,8 +97,8 @@ routes: ## Listar rutas definidas en la app Rails
 test-db: ## Crear DB de test y correr migraciones; instala gems en vendor/bundle si hace falta
 	$(CORE) sh -c "bundle config set --local path vendor/bundle && bundle install && env RAILS_ENV=test bundle exec rails db:create db:migrate"
 
-test-core: test-db ## Ejecutar specs RSpec del core-engine
-	$(CORE) env RAILS_ENV=test bundle exec rspec --format documentation
+test-core: ## Ejecutar specs RSpec del core-engine (incluye setup de DB y gems en vendor/bundle)
+	$(CORE) sh -c "bundle config set --local path vendor/bundle && bundle install && env RAILS_ENV=test bundle exec rails db:create db:migrate && env RAILS_ENV=test bundle exec rspec --format documentation"
 
 lint-core: ## Lint Ruby (RuboCop) en core-engine
 	$(CORE) bundle exec rubocop --format simple
@@ -107,14 +107,18 @@ lint-core: ## Lint Ruby (RuboCop) en core-engine
 pip-install: ## Instalar dependencias Python en calculation-workers (requirements.txt)
 	$(WORKERS) pip install -r requirements.txt
 
-test-workers: ## Ejecutar tests pytest de calculation-workers
-	$(WORKERS) pytest -v
+test-workers: ## Ejecutar tests pytest de calculation-workers (con cobertura; ver htmlcov/)
+	$(WORKERS) pytest
 
 lint-workers: ## Lint Python (ruff) en calculation-workers
 	$(WORKERS) ruff check src/
 
+# --- JavaScript (Vitest) - en host; requiere Node 20+ y npm install en services/core-engine ---
+test-js: ## Ejecutar tests Vitest de app/javascript (Stimulus) en core-engine
+	cd services/core-engine && npm run test
+
 # --- Agregados ---
-test: test-core test-workers  ## Ejecutar todos los tests (core-engine + calculation-workers)
+test: test-core test-workers  ## Ejecutar todos los tests (RSpec + pytest). Opcional: make test-js (requiere Node)
 
 lint: lint-core lint-workers  ## Ejecutar lint en ambos servicios (RuboCop + ruff)
 
