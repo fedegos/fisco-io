@@ -39,7 +39,7 @@
           <th scope="col">Razón social</th>
           <th scope="col">Nombre de fantasía</th>
           <th scope="col">Estado</th>
-          <th scope="col">Acciones</th>
+          <th scope="col" class="actions-col">Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -47,7 +47,7 @@
           <% @sujetos.each do |s| %>
             <tr>
               <td><code class="code--small"><%= s.subject_id %></code></td>
-              <td><%= s.tax_id %></td>
+              <td class="cell-tax-id"><%= s.tax_id %></td>
               <td><%= s.legal_name %></td>
               <td><%= s.trade_name %></td>
               <td><span class="badge badge--muted"><%= s.status == "active" ? "Activo" : (s.status == "inactive" ? "Inactivo" : s.status) %></span></td>

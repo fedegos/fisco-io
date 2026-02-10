@@ -6,7 +6,9 @@ button.btn,
 summary.btn,
 input.btn[type="submit"],
 input.btn[type="button"] {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: var(--space-sm) var(--space-lg);
   min-height: 2.75rem;
   font-family: var(--font-sans);
