@@ -34,6 +34,7 @@ Rails.application.routes.draw do
     post "configuracion/inmobiliario/:year/brackets", to: "inmobiliario_brackets#create"
     get "obligaciones/:id", to: "obligaciones#show", as: :obligacion
     get "padron/sujetos", to: "padron_sujetos#index", as: :padron_sujetos
+    get "padron/sujetos/buscar", to: "padron_sujetos#buscar", as: :buscar_padron_sujetos
     get "padron/sujetos/new", to: "padron_sujetos#new", as: :new_padron_sujeto
     post "padron/sujetos", to: "padron_sujetos#create"
     get "padron/sujetos/:id", to: "padron_sujetos#show", as: :padron_sujeto

@@ -1,31 +1,64 @@
 <% content_for :title, "Abrir partida - Operadores - Fisco.io" %>
-<div class="page-container">
+<div class="page-container" data-controller="subject-search-modal" data-subject-search-modal-buscar-url-value="<%= operadores_buscar_padron_sujetos_path %>">
   <header class="page-header">
     <p class="page-subtitle"><%= link_to "Padrón de objetos", operadores_padron_objetos_path %> → Abrir partida</p>
     <h1 class="page-title">Abrir partida</h1>
   </header>
   <div class="card">
     <%= form_with model: @obligacion, url: operadores_padron_objetos_path, method: :post, local: true do |f| %>
+      <%= f.hidden_field :subject_id, data: { subject_search_modal_target: "subjectIdInput" }, id: "tax_account_balance_subject_id" %>
+
       <div class="form-field">
-        <%= f.label :subject_id, "ID del sujeto (UUID)" %>
-        <%= f.text_field :subject_id, class: "form-input", required: true %>
+        <label class="form-field__label">Sujeto responsable</label>
+        <p class="form-field__hint">Busque por CUIT/CUIL, razón social o nombre de fantasía y seleccione de la lista.</p>
+        <div class="subject-selection-summary <%= 'is-hidden' unless @sujeto_seleccionado %>" data-subject-search-modal-target="summaryBlock">
+          <dl class="dl-list dl-list--compact">
+            <dt>CUIT / N.º fiscal</dt>
+            <dd data-subject-search-modal-target="summaryCuit"><%= @sujeto_seleccionado&.tax_id %></dd>
+            <dt>Razón social</dt>
+            <dd data-subject-search-modal-target="summaryRazonSocial"><%= @sujeto_seleccionado&.legal_name %></dd>
+            <dt>Nombre de fantasía</dt>
+            <dd data-subject-search-modal-target="summaryNombreFantasia"><%= @sujeto_seleccionado&.trade_name %></dd>
+          </dl>
+          <button type="button" class="btn btn--secondary btn--sm" data-action="click->subject-search-modal#clearSelection">Cambiar sujeto</button>
+        </div>
+        <div class="subject-selection-search <%= 'is-hidden' if @sujeto_seleccionado %>" data-subject-search-modal-target="openButtonWrapper">
+          <button type="button" class="btn btn--secondary" data-action="click->subject-search-modal#open">Buscar por CUIT o razón social</button>
+        </div>
       </div>
+
       <div class="form-field">
         <%= f.label :tax_type, "Tipo de impuesto" %>
         <%= f.select :tax_type, options_for_select([["inmobiliario", "inmobiliario"], ["ingresos_brutos", "ingresos_brutos"]], @obligacion.tax_type), {}, class: "form-input" %>
       </div>
       <div class="form-field">
         <%= f.label :role, "Rol" %>
-        <%= f.select :role, options_for_select([["contribuyente", "contribuyente"], ["agente_recaudacion", "agente_recaudacion"]], @obligacion.role), {}, class: "form-input" %>
+        <%= f.select :role, options_for_select([["Contribuyente", "contribuyente"], ["Apoderado", "apoderado"], ["Responsable sustituto", "sustituto"]], @obligacion.role), {}, class: "form-input" %>
       </div>
       <div class="form-field">
         <%= f.label :external_id, "Identificador externo (opcional)" %>
-        <%= f.text_field :external_id, class: "form-input" %>
+        <%= f.text_field :external_id, class: "form-input", placeholder: "Ej. partido-partida para inmobiliario" %>
       </div>
       <div class="form-actions">
         <%= f.submit "Abrir partida", class: "btn btn--primary" %>
         <%= link_to "Cancelar", operadores_padron_objetos_path, class: "btn btn--secondary" %>
       </div>
     <% end %>
+  </div>
+
+  <div class="modal-overlay modal-overlay--subject-search is-hidden" data-subject-search-modal-target="overlay" aria-hidden="true" data-action="click->subject-search-modal#close">
+    <div class="modal-content" data-action="click->subject-search-modal#stopPropagation" role="dialog" aria-labelledby="subject_search_modal_title" aria-modal="true">
+      <header class="modal-header">
+        <h2 id="subject_search_modal_title" class="modal-title">Buscar sujeto</h2>
+        <button type="button" class="modal-close" aria-label="Cerrar" data-action="click->subject-search-modal#close">×</button>
+      </header>
+      <div class="modal-body">
+        <div class="form-field">
+          <label for="subject_search_q" class="form-field__label">CUIT, razón social o nombre de fantasía</label>
+          <input type="text" id="subject_search_q" class="form-input" placeholder="Ej. 20-11111111-1 o nombre..." data-subject-search-modal-target="input" data-action="input->subject-search-modal#search" autocomplete="off" />
+        </div>
+        <div class="subject-search-results-wrapper" data-subject-search-modal-target="results"></div>
+      </div>
+    </div>
   </div>
 </div>

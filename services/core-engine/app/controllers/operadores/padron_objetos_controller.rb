@@ -23,6 +23,7 @@ module Operadores
 
     def new
       @obligacion = TaxAccountBalance.new
+      @obligacion.role = "contribuyente"
     end
 
     def create
@@ -37,6 +38,7 @@ module Operadores
       unless cmd.primary_subject_id.present? && cmd.tax_type.present?
         flash.now[:alert] = "Sujeto y tipo de impuesto son obligatorios."
         @obligacion = TaxAccountBalance.new(**(params[:tax_account_balance]&.permit(:subject_id, :tax_type, :role, :external_id)&.to_h || {}).symbolize_keys)
+        @sujeto_seleccionado = SubjectReadModel.find_by(subject_id: params[:tax_account_balance][:subject_id]) if params[:tax_account_balance][:subject_id].present?
         render :new, status: :unprocessable_entity
         return
       end
@@ -45,6 +47,7 @@ module Operadores
     rescue StandardError => e
       flash.now[:alert] = "Error al crear: #{e.message}"
       @obligacion = TaxAccountBalance.new(**(params[:tax_account_balance]&.permit(:subject_id, :tax_type, :role, :external_id)&.to_h || {}).symbolize_keys)
+      @sujeto_seleccionado = SubjectReadModel.find_by(subject_id: params[:tax_account_balance][:subject_id]) if params[:tax_account_balance][:subject_id].present?
       render :new, status: :unprocessable_entity
     end
 

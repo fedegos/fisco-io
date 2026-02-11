@@ -7,6 +7,9 @@ class TaxAccountBalance < ActiveRecord::Base
   self.table_name = "tax_account_balances"
   self.primary_key = "obligation_id"
 
+  # Atributo virtual para el formulario de alta (Abrir partida); no se persiste en la tabla
+  attr_accessor :role
+
   # obligation_id (uuid PK), subject_id, tax_type, external_id (mostrable), current_balance, ...
   validates :obligation_id, :subject_id, :tax_type, presence: true
 

@@ -5,6 +5,34 @@
 require "rails_helper"
 
 RSpec.describe "Operadores / Padrón sujetos", type: :request do
+  describe "GET buscar" do
+    it "responde JSON con lista de sujetos que coinciden con q" do
+      SubjectReadModel.create!(
+        subject_id: SecureRandom.uuid,
+        legal_name: "Empresa SA",
+        tax_id: "20-11111111-1",
+        registration_date: Date.current,
+        status: "active"
+      )
+
+      get operadores_buscar_padron_sujetos_path, params: { q: "11111111" }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq("application/json")
+      data = response.parsed_body
+      expect(data).to be_an(Array)
+      expect(data.size).to eq(1)
+      expect(data.first).to include("subject_id", "tax_id" => "20-11111111-1", "legal_name" => "Empresa SA")
+    end
+
+    it "responde array vacío cuando no hay coincidencias" do
+      get operadores_buscar_padron_sujetos_path, params: { q: "ningunoexistente999" }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body).to eq([])
+    end
+  end
+
   describe "GET snapshot_at" do
     let(:subject_id) { SecureRandom.uuid }
 

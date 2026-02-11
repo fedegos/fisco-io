@@ -20,6 +20,21 @@ module Operadores
       @sujetos = scope.offset((@page - 1) * @per_page).limit(@per_page)
     end
 
+    def buscar
+      scope = SubjectReadModel.where(status: "active").order(:legal_name)
+      if params[:q].to_s.strip.present?
+        q = "%#{params[:q].to_s.strip}%"
+        scope = scope.where(
+          "legal_name ILIKE :q OR trade_name ILIKE :q OR tax_id ILIKE :q",
+          q: q
+        )
+      else
+        scope = scope.limit(20)
+      end
+      sujetos = scope.limit(25).map { |r| { subject_id: r.subject_id, tax_id: r.tax_id, legal_name: r.legal_name, trade_name: r.trade_name.to_s } }
+      render json: sujetos
+    end
+
     def new
       @sujeto = SubjectReadModel.new
     end
