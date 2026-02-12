@@ -60,9 +60,15 @@
             <%= l(ev.created_at, format: :long) %>
           </p>
           <details class="details-block">
-            <summary>Ver datos (JSON)</summary>
-            <pre><%= JSON.pretty_generate(ev.data || {}) %></pre>
+            <summary>Ver datos del evento</summary>
+            <pre class="json-preview"><%= JSON.pretty_generate(ev.data || {}) %></pre>
           </details>
+          <% if ev.metadata.present? && ev.metadata != {} %>
+            <details class="details-block">
+              <summary>Metadata</summary>
+              <pre class="json-preview"><%= JSON.pretty_generate(ev.metadata) %></pre>
+            </details>
+          <% end %>
         </article>
       <% end %>
     <% else %>

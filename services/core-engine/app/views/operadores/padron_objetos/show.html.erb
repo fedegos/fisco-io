@@ -80,10 +80,16 @@
     <ul class="event-list">
       <% @eventos.each do |ev| %>
         <li class="event-list__item">
-          <span class="badge badge--muted">v<%= ev.event_version %></span>
-          <strong><%= ev.event_type %></strong>
-          <span class="event-list__meta"><%= ev.created_at.to_fs(:short) %></span>
-          <%= link_to "Ver estado hasta aquí", operadores_snapshot_at_padron_objeto_path(@obligacion.obligation_id, up_to_version: ev.event_version), class: "btn btn--secondary btn--sm", data: { turbo_frame: "snapshot_modal" } %>
+          <div class="event-list__header">
+            <span class="badge badge--muted">v<%= ev.event_version %></span>
+            <strong><%= ev.event_type %></strong>
+            <span class="event-list__meta"><%= ev.created_at.to_fs(:short) %></span>
+            <%= link_to "Ver estado hasta aquí", operadores_snapshot_at_padron_objeto_path(@obligacion.obligation_id, up_to_version: ev.event_version), class: "btn btn--secondary btn--sm", data: { turbo_frame: "snapshot_modal" } %>
+          </div>
+          <details class="details-block">
+            <summary>Ver datos del evento</summary>
+            <pre class="json-preview"><%= JSON.pretty_generate(ev.data || {}) %></pre>
+          </details>
         </li>
       <% end %>
     </ul>

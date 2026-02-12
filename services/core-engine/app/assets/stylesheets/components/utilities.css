@@ -224,12 +224,19 @@
 }
 
 .event-list__item {
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.event-list__item:last-child {
+  border-bottom: none;
+}
+
+.event-list__header {
   display: flex;
   align-items: center;
   gap: var(--space-md);
   flex-wrap: wrap;
-  padding: var(--space-sm) 0;
-  border-bottom: 1px solid var(--color-border);
 }
 
 .event-list__meta {
@@ -253,16 +260,46 @@
 
 .details-block summary {
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
+  color: var(--color-primary);
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.details-block summary:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+.details-block summary::-webkit-details-marker {
+  display: none;
+}
+
+.details-block summary::before {
+  content: "▸";
+  font-size: 0.75rem;
+  transition: transform 0.15s ease;
+}
+
+.details-block[open] summary::before {
+  transform: rotate(90deg);
 }
 
 .details-block pre {
   margin: var(--space-sm) 0 0;
   padding: var(--space-md);
   background: var(--color-bg);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  font-family: var(--font-mono);
   font-size: 0.75rem;
+  line-height: 1.5;
   overflow-x: auto;
+  color: var(--color-text);
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 /* Grilla tramos (inmobiliario) */
