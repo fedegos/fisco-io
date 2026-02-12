@@ -51,8 +51,8 @@ module Operadores
         render :new, status: :unprocessable_entity
         return
       end
-      Identity::Handlers::EnrollSubjectHandler.new.call(cmd)
-      redirect_to operadores_padron_sujetos_path, notice: "Sujeto creado correctamente."
+      result = Identity::Handlers::EnrollSubjectHandler.new.call(cmd)
+      redirect_to operadores_padron_sujeto_path(result[:subject_id]), notice: "Sujeto creado correctamente."
     rescue StandardError => e
       @sujeto = SubjectReadModel.new(**(params[:subject_read_model]&.permit(:tax_id, :legal_name, :trade_name)&.to_h || {}).symbolize_keys)
       flash.now[:alert] = "Error al crear: #{e.message}"
@@ -87,7 +87,7 @@ module Operadores
         return
       end
       Identity::Handlers::UpdateSubjectContactDataHandler.new.call(cmd)
-      redirect_to operadores_padron_sujetos_path, notice: "Sujeto actualizado."
+      redirect_to operadores_padron_sujeto_path(@sujeto.subject_id), notice: "Sujeto actualizado."
     rescue StandardError => e
       flash.now[:alert] = "Error al actualizar: #{e.message}"
       render :edit, status: :unprocessable_entity
@@ -127,7 +127,7 @@ module Operadores
         digital_domicile_id: params[:subject_read_model][:digital_domicile_id].to_s.presence
       )
       Identity::Handlers::ChangeSubjectDomicileHandler.new.call(cmd)
-      redirect_to operadores_padron_sujetos_path, notice: "Domicilio actualizado."
+      redirect_to operadores_padron_sujeto_path(@sujeto.subject_id), notice: "Domicilio actualizado."
     rescue StandardError => e
       flash.now[:alert] = "Error al actualizar domicilio: #{e.message}"
       render :domicilio, status: :unprocessable_entity
@@ -155,7 +155,7 @@ module Operadores
         **attrs.symbolize_keys
       )
       Identity::Handlers::CorrectSubjectByForceMajeureHandler.new.call(cmd)
-      redirect_to operadores_padron_sujetos_path, notice: "Corrección por fuerza mayor registrada."
+      redirect_to operadores_padron_sujeto_path(@sujeto.subject_id), notice: "Corrección por fuerza mayor registrada."
     rescue StandardError => e
       flash.now[:alert] = "Error: #{e.message}"
       render :corregir_fuerza_mayor, status: :unprocessable_entity

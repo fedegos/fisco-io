@@ -96,7 +96,7 @@ RSpec.describe "Operadores / Padrón sujetos", type: :request do
       expect(response.body).to include("Razón social y CUIT/CUIL son obligatorios.")
     end
 
-    it "crea sujeto y redirige al índice cuando los datos son válidos" do
+    it "crea sujeto y redirige al detalle del sujeto creado" do
       post operadores_padron_sujetos_path, params: {
         subject_read_model: {
           tax_id: "20-22222222-9",
@@ -105,7 +105,9 @@ RSpec.describe "Operadores / Padrón sujetos", type: :request do
         }
       }
 
-      expect(response).to redirect_to(operadores_padron_sujetos_path)
+      # Debe redirigir al detalle del sujeto creado, no al índice
+      expect(response).to have_http_status(:redirect)
+      expect(response.location).to match(%r{/operadores/padron/sujetos/[a-f0-9-]+})
       expect(flash[:notice]).to eq("Sujeto creado correctamente.")
     end
   end
@@ -137,7 +139,7 @@ RSpec.describe "Operadores / Padrón sujetos", type: :request do
       expect(response.body).to include("Razón social es obligatoria.")
     end
 
-    it "actualiza sujeto y redirige al índice cuando los datos son válidos" do
+    it "actualiza sujeto y redirige al detalle del sujeto" do
       allow(Identity::Handlers::UpdateSubjectContactDataHandler)
         .to receive(:new).and_return(double(call: true))
 
@@ -151,8 +153,53 @@ RSpec.describe "Operadores / Padrón sujetos", type: :request do
         }
       }
 
-      expect(response).to redirect_to(operadores_padron_sujetos_path)
+      # Debe redirigir al detalle del sujeto, no al índice
+      expect(response).to redirect_to(operadores_padron_sujeto_path(subject_id))
       expect(flash[:notice]).to eq("Sujeto actualizado.")
+    end
+  end
+
+  describe "PATCH domicilio" do
+    let(:subject_id) { SecureRandom.uuid }
+
+    before do
+      SubjectReadModel.create!(
+        subject_id: subject_id,
+        legal_name: "Test SA",
+        tax_id: "20-11111111-1",
+        registration_date: Date.current,
+        status: "active"
+      )
+      # Registrar el agregado en el event store
+      repo = EventStore::Repository.new
+      event = Identity::Events::SubjectRegistered.new(
+        aggregate_id: subject_id,
+        data: {
+          "subject_id" => subject_id,
+          "tax_id" => "20-11111111-1",
+          "legal_name" => "Test SA",
+          "status" => "active",
+          "registration_date" => Date.current.to_s
+        }
+      )
+      repo.append(subject_id, Identity::Subject.name, event)
+
+      allow_any_instance_of(Operadores::PadronSujetosController)
+        .to receive(:verify_authenticity_token).and_return(true)
+    end
+
+    it "actualiza domicilio y redirige al detalle del sujeto" do
+      patch operadores_domicilio_padron_sujeto_path(subject_id), params: {
+        subject_read_model: {
+          address_street: "Av. Siempreviva 742",
+          address_city: "Springfield",
+          address_province: "Buenos Aires",
+          address_postal_code: "1234"
+        }
+      }
+
+      expect(response).to redirect_to(operadores_padron_sujeto_path(subject_id))
+      expect(flash[:notice]).to eq("Domicilio actualizado.")
     end
   end
 
