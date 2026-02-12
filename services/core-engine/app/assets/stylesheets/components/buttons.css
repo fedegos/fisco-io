@@ -82,6 +82,22 @@ input.btn--sm[type="submit"] {
   font-size: 0.875rem;
 }
 
+/* Danger: rojo (acciones destructivas) */
+.btn--danger,
+a.btn--danger,
+button.btn--danger {
+  background: var(--color-alert-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-alert-border);
+}
+
+.btn--danger:hover,
+a.btn--danger:hover,
+button.btn--danger:hover {
+  background: var(--color-alert-border);
+  color: var(--color-bg);
+}
+
 /* Submit/button sin clase .btn: mismo aspecto que secondary */
 .form-actions input[type="submit"]:not(.btn),
 .form-actions button[type="submit"]:not(.btn),

@@ -133,3 +133,17 @@
 .valuacion-form-row .form-field {
   margin-bottom: 0;
 }
+
+/* Contact entries (agregar/quitar dinámico) */
+.contact-entry-row {
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.contact-entry-row:last-of-type {
+  border-bottom: none;
+}
+
+.contact-entries-actions {
+  margin-top: var(--space-md);
+}
