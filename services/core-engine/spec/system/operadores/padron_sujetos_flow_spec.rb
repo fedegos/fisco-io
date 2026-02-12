@@ -54,4 +54,45 @@ RSpec.describe "Operadores / Padrón sujetos (flujo)", type: :system do
       expect(page).to have_content("Test SA")
     end
   end
+
+  describe "snapshot_at (ver estado hasta evento)" do
+    let(:subject_id) { SecureRandom.uuid }
+
+    before do
+      SubjectReadModel.create!(
+        subject_id: subject_id,
+        legal_name: "Test SA",
+        tax_id: "20-11111111-1",
+        registration_date: Date.current,
+        status: "active"
+      )
+    end
+
+    it "muestra el modal de snapshot cuando no hay eventos" do
+      visit operadores_snapshot_at_padron_sujeto_path(subject_id, up_to_version: 1)
+
+      expect(page).to have_content("No hay datos hasta este evento")
+    end
+
+    it "muestra el modal de snapshot cuando hay eventos" do
+      # Registrar un evento en el event store
+      repo = EventStore::Repository.new
+      event = Identity::Events::SubjectRegistered.new(
+        aggregate_id: subject_id,
+        data: {
+          "subject_id" => subject_id,
+          "tax_id" => "20-11111111-1",
+          "legal_name" => "Test SA",
+          "status" => "active",
+          "registration_date" => Date.current.to_s
+        }
+      )
+      repo.append(subject_id, Identity::Subject.name, event)
+
+      visit operadores_snapshot_at_padron_sujeto_path(subject_id, up_to_version: 1)
+
+      expect(page).to have_content("Estado del sujeto hasta este evento")
+      expect(page).to have_content("Test SA")
+    end
+  end
 end

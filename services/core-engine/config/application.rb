@@ -21,8 +21,11 @@ module CoreEngine
     config.autoload_lib(ignore: %w[assets tasks])
     config.api_only = false
 
-    # Incluir app/ para que Zeitwerk cargue event_store, modules, etc.
-    config.autoload_paths << Rails.root.join("app")
+    # Agregar app/ como raíz de autoload para que Zeitwerk cargue:
+    # - app/event_store.rb → EventStore
+    # - app/event_store/repository.rb → EventStore::Repository
+    # - app/modules/* → módulos de dominio
+    config.autoload_paths << Rails.root.join("app").to_s
 
     # Assets: precompilar application.css y application.js
     config.assets.enabled = true
